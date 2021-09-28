@@ -1,23 +1,56 @@
 library(httr)
 library(jsonlite)
+library(tidyverse)
 
 
-ditto <- GET("https://pokeapi.co/api/v2/pokemon/ditto/encounters")
+encounter <- function(poke, game = "all") {
 
-ditto_data <- ditto$content
-
-ditto_data <- rawToChar(ditto_data)
-
-ditto_data <- fromJSON(ditto_data,  flatten = TRUE)
-
-rattatt
+poke <- tolower(poke)
+game <- tolower(game)
+  
+raw_data <- fromJSON(paste0("https://pokeapi.co/api/v2/pokemon/",poke,"/encounters"), flatten = TRUE)
 
 
+# this function is designed for getting where to find specific Pokemon
+for (i in 1:dim(raw_data)[1]) {
+  
+  loc <- raw_data[i,2]
+  
 
-rattata <- GET("https://pokeapi.co/api/v2/pokemon/rattata/encounters")
 
-rattata_data <- rattata$content
+  for (b in 1:dim(raw_data[[1]][[i]])[1]){
+    
+    gm <- raw_data[[1]][[i]][b,3]
+    line <- c(loc,gm)
+    if(b == 1)
+      {dfg <- tibble(loc, gm)
+    }else{
+    dfg <- rbind(dfg,line)
+  }
+  }
 
-rattata_data <- rawToChar(rattata_data)
+  if(i==1){
+    df <- dfg
+  }else{
+    df <- rbind(df,dfg)
+  }
+  }
 
-rattata_data <- fromJSON(rattata_data,  flatten = TRUE)
+if(game == "all"){
+   return(df)
+}else{
+    return(df %>%
+             filter(gm == game))
+  }
+
+}
+
+
+ditto <- encounter("ditto")
+ditto2 <- encounter("ditto","red")
+
+
+
+
+
+    
