@@ -47,7 +47,7 @@ if(game == "all"){
 
 
 ditto <- encounter("ditto")
-ditto2 <- encounter("ditto","red")
+ditto2 <- encounter("ditto","RED")
 
 
 
