@@ -130,10 +130,57 @@ body {
 <span id="cb2-83"><a href="#cb2-83" aria-hidden="true" tabindex="-1"></a>  } <span class="co"># End of if else statement.</span></span>
 <span id="cb2-84"><a href="#cb2-84" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-85"><a href="#cb2-85" aria-hidden="true" tabindex="-1"></a>} <span class="co"># Close of function.</span></span></code></pre></div>
+<h2 id="stats-function">Stats Function</h2>
+<p>Another major portion of the Pokemon video games is battling. During a battle you want to make sure you have the strongest Pokemon, the way their strength is determined is through their “base stats”.</p>
+<p>Their base stats are:<br />
+* <a href="https://bulbapedia.bulbagarden.net/wiki/Stat#HP">HP</a><br />
+* <a href="https://bulbapedia.bulbagarden.net/wiki/Stat#Attack">Attack</a> * <a href="https://bulbapedia.bulbagarden.net/wiki/Stat#Defense">Defense</a><br />
+* <a href="https://bulbapedia.bulbagarden.net/wiki/Stat#Special_Attack">Special Attack</a><br />
+* <a href="https://bulbapedia.bulbagarden.net/wiki/Stat#Special_Defense">Special Defense</a><br />
+* <a href="https://bulbapedia.bulbagarden.net/wiki/Stat#Speed">Speed</a></p>
+<p>You can read about what each one means by clicking on their names as they are links to the Bulbapedia website which is a treasure trove of Pokemon knowledge.</p>
+<p>The <code>stats</code> function is built below and it will return this information about the Pokemon the user chooses. The function takes a single argument which is <code>poke</code> this can be a either a single character string or a vector of them if you want to return the details about more Pokemon.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create the function</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>stats <span class="ot">&lt;-</span> <span class="cf">function</span>(poke) {</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Looping for entrance of a vector</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(poke)){</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Get requested data from API</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  raw_data <span class="ot">&lt;-</span> <span class="fu">fromJSON</span>(<span class="fu">paste0</span>(<span class="st">&quot;https://pokeapi.co/api/v2/pokemon/&quot;</span>,poke[i]), <span class="at">flatten =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Select only the information about the base stats</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  df <span class="ot">&lt;-</span> <span class="fu">as_tibble</span>(raw_data[[<span class="st">&quot;stats&quot;</span>]])</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Add a column for the name of the Pokemon </span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  df<span class="sc">$</span>name <span class="ot">&lt;-</span> <span class="fu">str_to_sentence</span>(poke[i])</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Keep only needed columns and reorder</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>  df <span class="ot">&lt;-</span> df[,<span class="fu">c</span>(<span class="dv">5</span>,<span class="dv">1</span>,<span class="dv">3</span>)]</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Pivot from long form to a single row</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>  df <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> stat.name, <span class="at">values_from =</span> base_stat)</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>  <span class="co"># If first iteration of loop, the final tibble is is created</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>  <span class="co"># If not the first iteration bind the final tibble from the previous loops </span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>  <span class="co"># with the new information</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span>( i <span class="sc">==</span> <span class="dv">1</span>){</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>  final <span class="ot">&lt;-</span> df</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>}<span class="cf">else</span>{</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>  final <span class="ot">&lt;-</span> <span class="fu">rbind</span>(final,df)</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>} <span class="co"># End if else statement</span></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>  }<span class="co"># End loop</span></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Return the final tibble.</span></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(final)</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>} <span class="co"># End function</span></span></code></pre></div>
+<h2 id="basic-functionality">Basic Functionality</h2>
 <p>Here we test the encounter function with my favorite starter Pokemon <strong>CHARMANDER</strong>.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>charmander <span class="ot">&lt;-</span> <span class="fu">encounter</span>(<span class="st">&quot;charmander&quot;</span>)</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(charmander)</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>charmander <span class="ot">&lt;-</span> <span class="fu">encounter</span>(<span class="st">&quot;charmander&quot;</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(charmander)</span></code></pre></div>
 <pre><code>## # A tibble: 9 x 6
 ##   Location            Game       Chance Max_Level Min_Level Method
 ##   &lt;chr&gt;               &lt;chr&gt;       &lt;int&gt;     &lt;int&gt;     &lt;int&gt; &lt;chr&gt; 
