@@ -130,9 +130,9 @@ if(game == "all"){
 }else{
     return(dfl %>%
              filter(Game == game))
-  } # End of is else statement.
+  } # End of if else statement.
 
-} # Close of function
+} # Close of function.
 ```
 
 Here we test the encounter function with my favorite starter Pokemon
