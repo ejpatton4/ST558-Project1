@@ -128,7 +128,7 @@ if(game == "all"){
              filter(Game == game))
   } # End of if else statement.
 
-} # Close of function
+} # Close of function.
 ```
 
 
