@@ -21,7 +21,7 @@ EDA:
 1. Combine stats and size  
 1. Create BMI variable and at least one other that is TBD.  
 1. Contingency table(s) on encounters, and egg groups.  
-1. Create qunatitative summaries on size, stats, both or other.
+1. Create quantitative summaries on size, stats, both or other.
 
 
 

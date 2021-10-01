@@ -37,10 +37,12 @@ body {
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages(&quot;tidyverse&quot;)</span></span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages(&quot;httr&quot;)</span></span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages(&quot;jsonlite&quot;)</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(httr)</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(jsonlite)</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code></pre></div>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages(&quot;knitr&quot;)</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(httr)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(jsonlite)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span></code></pre></div>
 <h2 id="encounter-function">Encounter Function</h2>
 <p>Pokemon fans around the world, myself included, know the catch phrase from the TV show by heart. <strong>“Gotta Catch ’em All”</strong>. That speaks to a major part of both the Pokemon TV shows and the video games, which is collecting all the different Pokemon from around the fictional world and filling up your PokeDex with their information.</p>
 <p>However, before you can catch ’em, you gotta find ’em. That is the purpose of this function is to find what locations in games you can find Pokemon in the wild. It will also return the chance of encountering the Pokemon there, the minimum level, the maximum level, and how you would encounter the Pokemon (walking in tall grass vs being given as a gift as an example.)</p>
@@ -134,7 +136,8 @@ body {
 <p>Another major portion of the Pokemon video games is battling. During a battle you want to make sure you have the strongest Pokemon, the way their strength is determined is through their “base stats”.</p>
 <p>Their base stats are:<br />
 * <a href="https://bulbapedia.bulbagarden.net/wiki/Stat#HP">HP</a><br />
-* <a href="https://bulbapedia.bulbagarden.net/wiki/Stat#Attack">Attack</a> * <a href="https://bulbapedia.bulbagarden.net/wiki/Stat#Defense">Defense</a><br />
+* <a href="https://bulbapedia.bulbagarden.net/wiki/Stat#Attack">Attack</a><br />
+* <a href="https://bulbapedia.bulbagarden.net/wiki/Stat#Defense">Defense</a><br />
 * <a href="https://bulbapedia.bulbagarden.net/wiki/Stat#Special_Attack">Special Attack</a><br />
 * <a href="https://bulbapedia.bulbagarden.net/wiki/Stat#Special_Defense">Special Defense</a><br />
 * <a href="https://bulbapedia.bulbagarden.net/wiki/Stat#Speed">Speed</a></p>
@@ -163,7 +166,7 @@ body {
 <span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> stat.name, <span class="at">values_from =</span> base_stat)</span>
 <span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>  </span>
 <span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>  <span class="co"># If first iteration of loop, the final tibble is is created</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>  <span class="co"># If first iteration of loop, the final tibble  is created</span></span>
 <span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>  <span class="co"># If not the first iteration bind the final tibble from the previous loops </span></span>
 <span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>  <span class="co"># with the new information</span></span>
 <span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span>( i <span class="sc">==</span> <span class="dv">1</span>){</span>
@@ -176,11 +179,253 @@ body {
 <span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Return the final tibble.</span></span>
 <span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(final)</span>
 <span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>} <span class="co"># End function</span></span></code></pre></div>
+<h2 id="size-function">Size Function</h2>
+<p>If you were interested in the heights and weights of Pokemon you can use the <code>size</code> function. The <code>size</code> function takes a single argument, <code>poke</code> that can be either a single character string of a Pokemon name, or a vector of names if you wanted the information on more than one Pokemon.</p>
+<p>The output of the <code>stats</code> function is a tibble with the Pokemons name, Height in meters, and Weight in kilograms.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create function.</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>size <span class="ot">&lt;-</span> <span class="cf">function</span>(poke) {</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Start loop if there is more than one Pokemon inputted.</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(poke)){</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Get requested data from API.</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  raw_data <span class="ot">&lt;-</span> <span class="fu">fromJSON</span>(<span class="fu">paste0</span>(<span class="st">&quot;https://pokeapi.co/api/v2/pokemon/&quot;</span>,poke[i]), <span class="at">flatten =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Create objects to hold the height weight and name. </span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  ht <span class="ot">&lt;-</span> raw_data[[<span class="st">&quot;height&quot;</span>]]</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  wt <span class="ot">&lt;-</span> raw_data[[<span class="st">&quot;weight&quot;</span>]]</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  Name <span class="ot">&lt;-</span> <span class="fu">str_to_sentence</span>(poke[i])</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Turn the objects into a tibble. </span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>  df <span class="ot">&lt;-</span> <span class="fu">tibble</span>(Name,ht,wt)</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>  <span class="co"># If first iteration of loop, the final tibble  is created</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>  <span class="co"># If not the first iteration bind the final tibble from the previous loops </span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>  <span class="co"># with the new information</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span>( i <span class="sc">==</span> <span class="dv">1</span>){</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>  final <span class="ot">&lt;-</span> df</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>}<span class="cf">else</span>{</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>  final <span class="ot">&lt;-</span> <span class="fu">rbind</span>(final,df)</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>} <span class="co"># End if else statement</span></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>  } <span class="co"># End loop</span></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Edit the tibble before returning.</span></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Height is stored decimeters, and weight as hectograms. </span></span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>  <span class="co"># We change them to meters and kilograms.</span></span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Finally select only the needed columns.</span></span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>  final <span class="ot">&lt;-</span> final <span class="sc">%&gt;%</span></span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">Height_Meters =</span> ht <span class="sc">/</span> <span class="dv">10</span>,</span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>           <span class="at">Weight_Kilograms =</span> wt <span class="sc">/</span> <span class="dv">10</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(Name,Height_Meters,Weight_Kilograms)</span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>   <span class="co"># Return the tibble.</span></span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(final)</span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>} <span class="co"># End of function</span></span></code></pre></div>
+<h2 id="dex-function">Dex Function</h2>
+<p>Throughout the Pokemon world there are various regions. Each region has their own Pokedex as each region has their own Pokemon, sometimes Pokemon can be found in multiple regions and other times they are only found in one region. There is also a “National Dex” that gives a unique number to every Pokemon in existence. The <code>dex</code> function is designed to look up the Pokedex entries for a given region or in all regions.</p>
+<p>The <code>dex</code> function takes two arguments, the first is <code>reg</code> which is the specific region the user is looking up. This will default to the National Dex if no region is chosen. The <code>reg</code> argument can accept either the character string version of the region name or the id number for the region (The relationship between the id number and name will be shown after the function is built). This can also be a single input or a vector.</p>
+<p>The second argument is <code>poke</code> which is optional, this is to be used if you want to filter the results down to specific Pokemon. This can be a single character string or a vector of character strings. If no argument is provided, the function defaults to all Pokemon that are in the requested Pokedex(es).</p>
+<p><strong>OF NOTE THE API DOES NOT HAVE A REGION ID #10 IF YOU INCLUDE 10 IN THE <code>reg</code> ARGUMENT, THE FUNCTION WILL NOT WORK.</strong></p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define function</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>dex <span class="ot">&lt;-</span> <span class="cf">function</span>(<span class="at">reg =</span> <span class="dv">1</span>,<span class="at">poke =</span> <span class="st">&quot;all&quot;</span>){</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># If &quot;all&quot; is selected for the reg argument, reg is defined as all available ID numbers.</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># If not reg remains what the user inputs.</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>( <span class="st">&quot;all&quot;</span> <span class="sc">%in%</span> <span class="fu">tolower</span>(reg)){</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    reg <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>,<span class="dv">11</span><span class="sc">:</span><span class="dv">29</span>)</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  }<span class="cf">else</span>{</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    reg <span class="ot">&lt;-</span> reg</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  }  <span class="co"># End if else statement.</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Begin Dex loop, for all Pokedexes requested.</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(a <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(reg)){</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Get the data on the specific dex.</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    raw_data <span class="ot">&lt;-</span> <span class="fu">fromJSON</span>(<span class="fu">paste0</span>(<span class="st">&quot;https://pokeapi.co/api/v2/pokedex/&quot;</span>,reg[a]), <span class="at">flatten =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Save name of region</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>    dex_name <span class="ot">&lt;-</span> <span class="fu">str_to_sentence</span>(raw_data[[<span class="st">&quot;name&quot;</span>]])</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Begin poke loop for every Pokemon inside of specific dex.</span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">dim</span>(raw_data[[<span class="st">&quot;pokemon_entries&quot;</span>]])[<span class="dv">1</span>]){</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Save the Pokedex entry number for the Pokemon.</span></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>      dex_num <span class="ot">&lt;-</span> raw_data[[<span class="st">&quot;pokemon_entries&quot;</span>]][i,<span class="dv">1</span>]</span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Save the name of the Pokemon.</span></span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>      nm <span class="ot">&lt;-</span> <span class="fu">str_to_sentence</span>(raw_data[[<span class="st">&quot;pokemon_entries&quot;</span>]][i,<span class="dv">2</span>])</span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Combine the entry number and the name into a tibble.</span></span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>      row_info <span class="ot">&lt;-</span> <span class="fu">tibble</span>(nm,dex_num)</span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>      <span class="co"># If first iteration of Poke loop, df is defined as the row_info tibble.</span></span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>      <span class="co"># If not first iteration, df is combined with the latest row_info tibble to add new data.</span></span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span>(i <span class="sc">==</span> <span class="dv">1</span>){</span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>        df <span class="ot">&lt;-</span> row_info</span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>      }<span class="cf">else</span>{</span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>        df <span class="ot">&lt;-</span> <span class="fu">rbind</span>(df,row_info)</span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>      } <span class="co"># End if else statement</span></span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>    } <span class="co"># End Poke loop</span></span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Rename columns of df tibble, as Name for the Pokemons name and</span></span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>    <span class="co"># (dex_name)_Dex_Number, so if the National Dex is the one being put together,</span></span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>    <span class="co"># the column will be titled &quot;National_Dex_Number&quot;.</span></span>
+<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a>    <span class="fu">names</span>(df) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Name&quot;</span>,<span class="fu">paste0</span>(dex_name,<span class="st">&quot;_Dex_Number&quot;</span>))</span>
+<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a>    <span class="co"># If first iteration of Dex loop the final tibble is df tibble.</span></span>
+<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a>    <span class="co"># If not first iteration join final tibble and df tibble.</span></span>
+<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span>(a <span class="sc">==</span> <span class="dv">1</span>){</span>
+<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a>      final <span class="ot">&lt;-</span> df</span>
+<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a>    }<span class="cf">else</span>{</span>
+<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a>      final <span class="ot">&lt;-</span> <span class="fu">full_join</span>(final,df,<span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;Name&quot;</span><span class="ot">=</span><span class="st">&quot;Name&quot;</span>))</span>
+<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a>    } <span class="co"># End of if else statement</span></span>
+<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a>  } <span class="co"># End of Dex loop</span></span>
+<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-59"><a href="#cb5-59" aria-hidden="true" tabindex="-1"></a>  <span class="co"># If user specifies Pokemon, filter the final tibble by defined inputs.</span></span>
+<span id="cb5-60"><a href="#cb5-60" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="st">&quot;all&quot;</span> <span class="sc">%in%</span> <span class="fu">tolower</span>(poke)){</span>
+<span id="cb5-61"><a href="#cb5-61" aria-hidden="true" tabindex="-1"></a>    final <span class="ot">&lt;-</span> final</span>
+<span id="cb5-62"><a href="#cb5-62" aria-hidden="true" tabindex="-1"></a>  }<span class="cf">else</span>{</span>
+<span id="cb5-63"><a href="#cb5-63" aria-hidden="true" tabindex="-1"></a>    final <span class="ot">&lt;-</span> final <span class="sc">%&gt;%</span></span>
+<span id="cb5-64"><a href="#cb5-64" aria-hidden="true" tabindex="-1"></a>      <span class="fu">filter</span>(<span class="fu">tolower</span>(Name) <span class="sc">%in%</span> <span class="fu">tolower</span>(poke))</span>
+<span id="cb5-65"><a href="#cb5-65" aria-hidden="true" tabindex="-1"></a>  } <span class="co"># End of if else statement.</span></span>
+<span id="cb5-66"><a href="#cb5-66" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-67"><a href="#cb5-67" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Return final tibble.</span></span>
+<span id="cb5-68"><a href="#cb5-68" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(final)</span>
+<span id="cb5-69"><a href="#cb5-69" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-70"><a href="#cb5-70" aria-hidden="true" tabindex="-1"></a>} <span class="co"># End of function</span></span></code></pre></div>
+<p>Here is the relationship between the region names and their ID numbers.</p>
+<table>
+<thead>
+<tr class="header">
+<th align="right">region_id</th>
+<th align="left">region_name</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">1</td>
+<td align="left">national</td>
+</tr>
+<tr class="even">
+<td align="right">2</td>
+<td align="left">kanto</td>
+</tr>
+<tr class="odd">
+<td align="right">3</td>
+<td align="left">original-johto</td>
+</tr>
+<tr class="even">
+<td align="right">4</td>
+<td align="left">hoenn</td>
+</tr>
+<tr class="odd">
+<td align="right">5</td>
+<td align="left">original-sinnoh</td>
+</tr>
+<tr class="even">
+<td align="right">6</td>
+<td align="left">extended-sinnoh</td>
+</tr>
+<tr class="odd">
+<td align="right">7</td>
+<td align="left">updated-johto</td>
+</tr>
+<tr class="even">
+<td align="right">8</td>
+<td align="left">original-unova</td>
+</tr>
+<tr class="odd">
+<td align="right">9</td>
+<td align="left">updated-unova</td>
+</tr>
+<tr class="even">
+<td align="right">11</td>
+<td align="left">conquest-gallery</td>
+</tr>
+<tr class="odd">
+<td align="right">12</td>
+<td align="left">kalos-central</td>
+</tr>
+<tr class="even">
+<td align="right">13</td>
+<td align="left">kalos-coastal</td>
+</tr>
+<tr class="odd">
+<td align="right">14</td>
+<td align="left">kalos-mountain</td>
+</tr>
+<tr class="even">
+<td align="right">15</td>
+<td align="left">updated-hoenn</td>
+</tr>
+<tr class="odd">
+<td align="right">16</td>
+<td align="left">original-alola</td>
+</tr>
+<tr class="even">
+<td align="right">17</td>
+<td align="left">original-melemele</td>
+</tr>
+<tr class="odd">
+<td align="right">18</td>
+<td align="left">original-akala</td>
+</tr>
+<tr class="even">
+<td align="right">19</td>
+<td align="left">original-ulaula</td>
+</tr>
+<tr class="odd">
+<td align="right">20</td>
+<td align="left">original-poni</td>
+</tr>
+<tr class="even">
+<td align="right">21</td>
+<td align="left">updated-alola</td>
+</tr>
+<tr class="odd">
+<td align="right">22</td>
+<td align="left">updated-melemele</td>
+</tr>
+<tr class="even">
+<td align="right">23</td>
+<td align="left">updated-akala</td>
+</tr>
+<tr class="odd">
+<td align="right">24</td>
+<td align="left">updated-ulaula</td>
+</tr>
+<tr class="even">
+<td align="right">25</td>
+<td align="left">updated-poni</td>
+</tr>
+<tr class="odd">
+<td align="right">26</td>
+<td align="left">updated-kanto</td>
+</tr>
+<tr class="even">
+<td align="right">27</td>
+<td align="left">galar</td>
+</tr>
+<tr class="odd">
+<td align="right">28</td>
+<td align="left">isle-of-armor</td>
+</tr>
+<tr class="even">
+<td align="right">29</td>
+<td align="left">crown-tundra</td>
+</tr>
+</tbody>
+</table>
 <h2 id="basic-functionality">Basic Functionality</h2>
 <p>Here we test the encounter function with my favorite starter Pokemon <strong>CHARMANDER</strong>.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>charmander <span class="ot">&lt;-</span> <span class="fu">encounter</span>(<span class="st">&quot;charmander&quot;</span>)</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(charmander)</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use the function and save results in an object</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>charmander <span class="ot">&lt;-</span> <span class="fu">encounter</span>(<span class="st">&quot;charmander&quot;</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Print the object</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(charmander)</span></code></pre></div>
 <pre><code>## # A tibble: 9 x 6
 ##   Location            Game       Chance Max_Level Min_Level Method
 ##   &lt;chr&gt;               &lt;chr&gt;       &lt;int&gt;     &lt;int&gt;     &lt;int&gt; &lt;chr&gt; 
@@ -193,6 +438,48 @@ body {
 ## 7 kanto-route-24-area yellow        100        10        10 gift  
 ## 8 lumiose-city-area   x             100        10        10 gift  
 ## 9 lumiose-city-area   y             100        10        10 gift</code></pre>
+<p>Here is an example of the <code>stats</code> function, with a vector of four Pokemon.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a vector of four Pokemon</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>mons <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;charizard&quot;</span>,<span class="st">&quot;pidgey&quot;</span>,<span class="st">&quot;abra&quot;</span>,<span class="st">&quot;beedrill&quot;</span>) </span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Use the function on the vector</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>stat_example <span class="ot">&lt;-</span> <span class="fu">stats</span>(mons)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Print results</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(stat_example)</span></code></pre></div>
+<pre><code>## # A tibble: 4 x 7
+##   name         hp attack defense `special-attack` `special-defense` speed
+##   &lt;chr&gt;     &lt;int&gt;  &lt;int&gt;   &lt;int&gt;            &lt;int&gt;             &lt;int&gt; &lt;int&gt;
+## 1 Charizard    78     84      78              109                85   100
+## 2 Pidgey       40     45      40               35                35    56
+## 3 Abra         25     20      15              105                55    90
+## 4 Beedrill     65     90      40               45                80    75</code></pre>
+<p>Here we test the <code>size</code> function, with the same vector of four Pokemon from the <code>stats</code> example.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use the function on the vector</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>size_example <span class="ot">&lt;-</span> <span class="fu">size</span>(mons)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Print results</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(size_example)</span></code></pre></div>
+<pre><code>## # A tibble: 4 x 3
+##   Name      Height_Meters Weight_Kilograms
+##   &lt;chr&gt;             &lt;dbl&gt;            &lt;dbl&gt;
+## 1 Charizard           1.7             90.5
+## 2 Pidgey              0.3              1.8
+## 3 Abra                0.9             19.5
+## 4 Beedrill            1               29.5</code></pre>
+<p>Here we test the <code>dex</code> function. We are using regions with dex ids 1 through 5, and only returning results on our same four Pokemon from the previous two examples. Any <code>N/A</code> means that the Pokemon is not in that Pokedex.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use function on vectors</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>dex_example <span class="ot">&lt;-</span> <span class="fu">dex</span>(<span class="at">reg =</span> <span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>), <span class="at">poke =</span> mons)</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Print results</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(dex_example)</span></code></pre></div>
+<pre><code>## # A tibble: 4 x 6
+##   Name      National_Dex_Number Kanto_Dex_Number `Original-johto_Dex_Number` Hoenn_Dex_Number `Original-sinnoh_Dex_Number`
+##   &lt;chr&gt;                   &lt;int&gt;            &lt;int&gt;                       &lt;int&gt;            &lt;int&gt;                        &lt;int&gt;
+## 1 Charizard                   6                6                         231               NA                           NA
+## 2 Beedrill                   15               15                          29               NA                           NA
+## 3 Pidgey                     16               16                          10               NA                           NA
+## 4 Abra                       63               63                          89               39                           20</code></pre>
 
 </body>
 </html>
