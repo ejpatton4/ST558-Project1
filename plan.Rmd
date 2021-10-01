@@ -11,6 +11,16 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Plans
 
+
+
+To do:  
+1.  Add headers to the basic functionality section.  
+1.  Create egg group and evolution function.  
+1.  Create final wrapper function for rest of them.  
+1.  Begin EDA (see below), once all functions are completed this should go pretty quickly.  
+1.  Create blog post and submit!
+
+
 Functions:  
 1.  Base Stats  
 1.  Size  
