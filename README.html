@@ -43,6 +43,7 @@ body {
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(jsonlite)</span>
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span></code></pre></div>
+<h1 id="building-the-functions">Building the Functions</h1>
 <h2 id="encounter-function">Encounter Function</h2>
 <p>Pokemon fans around the world, myself included, know the catch phrase from the TV show by heart. <strong>“Gotta Catch ’em All”</strong>. That speaks to a major part of both the Pokemon TV shows and the video games, which is collecting all the different Pokemon from around the fictional world and filling up your PokeDex with their information.</p>
 <p>However, before you can catch ’em, you gotta find ’em. That is the purpose of this function is to find what locations in games you can find Pokemon in the wild. It will also return the chance of encountering the Pokemon there, the minimum level, the maximum level, and how you would encounter the Pokemon (walking in tall grass vs being given as a gift as an example.)</p>
@@ -181,7 +182,7 @@ body {
 <span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>} <span class="co"># End function</span></span></code></pre></div>
 <h2 id="size-function">Size Function</h2>
 <p>If you were interested in the heights and weights of Pokemon you can use the <code>size</code> function. The <code>size</code> function takes a single argument, <code>poke</code> that can be either a single character string of a Pokemon name, or a vector of names if you wanted the information on more than one Pokemon.</p>
-<p>The output of the <code>stats</code> function is a tibble with the Pokemons name, Height in meters, and Weight in kilograms.</p>
+<p>The output of the <code>size</code> function is a tibble with the Pokemons name, Height in meters, and Weight in kilograms.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create function.</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>size <span class="ot">&lt;-</span> <span class="cf">function</span>(poke) {</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  </span>
@@ -229,73 +230,78 @@ body {
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define function</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>dex <span class="ot">&lt;-</span> <span class="cf">function</span>(<span class="at">reg =</span> <span class="dv">1</span>,<span class="at">poke =</span> <span class="st">&quot;all&quot;</span>){</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># If &quot;all&quot; is selected for the reg argument, reg is defined as all available ID numbers.</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># If not reg remains what the user inputs.</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>( <span class="st">&quot;all&quot;</span> <span class="sc">%in%</span> <span class="fu">tolower</span>(reg)){</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    reg <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>,<span class="dv">11</span><span class="sc">:</span><span class="dv">29</span>)</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  }<span class="cf">else</span>{</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    reg <span class="ot">&lt;-</span> reg</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  }  <span class="co"># End if else statement.</span></span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Begin Dex loop, for all Pokedexes requested.</span></span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(a <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(reg)){</span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Get the data on the specific dex.</span></span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    raw_data <span class="ot">&lt;-</span> <span class="fu">fromJSON</span>(<span class="fu">paste0</span>(<span class="st">&quot;https://pokeapi.co/api/v2/pokedex/&quot;</span>,reg[a]), <span class="at">flatten =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Save name of region</span></span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>    dex_name <span class="ot">&lt;-</span> <span class="fu">str_to_sentence</span>(raw_data[[<span class="st">&quot;name&quot;</span>]])</span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Begin poke loop for every Pokemon inside of specific dex.</span></span>
-<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">dim</span>(raw_data[[<span class="st">&quot;pokemon_entries&quot;</span>]])[<span class="dv">1</span>]){</span>
-<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>      </span>
-<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Save the Pokedex entry number for the Pokemon.</span></span>
-<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>      dex_num <span class="ot">&lt;-</span> raw_data[[<span class="st">&quot;pokemon_entries&quot;</span>]][i,<span class="dv">1</span>]</span>
-<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>      </span>
-<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Save the name of the Pokemon.</span></span>
-<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>      nm <span class="ot">&lt;-</span> <span class="fu">str_to_sentence</span>(raw_data[[<span class="st">&quot;pokemon_entries&quot;</span>]][i,<span class="dv">2</span>])</span>
-<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>      </span>
-<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Combine the entry number and the name into a tibble.</span></span>
-<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>      row_info <span class="ot">&lt;-</span> <span class="fu">tibble</span>(nm,dex_num)</span>
-<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>      </span>
-<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>      <span class="co"># If first iteration of Poke loop, df is defined as the row_info tibble.</span></span>
-<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>      <span class="co"># If not first iteration, df is combined with the latest row_info tibble to add new data.</span></span>
-<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span>(i <span class="sc">==</span> <span class="dv">1</span>){</span>
-<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>        df <span class="ot">&lt;-</span> row_info</span>
-<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>      }<span class="cf">else</span>{</span>
-<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>        df <span class="ot">&lt;-</span> <span class="fu">rbind</span>(df,row_info)</span>
-<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>      } <span class="co"># End if else statement</span></span>
-<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>    } <span class="co"># End Poke loop</span></span>
-<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Rename columns of df tibble, as Name for the Pokemons name and</span></span>
-<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>    <span class="co"># (dex_name)_Dex_Number, so if the National Dex is the one being put together,</span></span>
-<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>    <span class="co"># the column will be titled &quot;National_Dex_Number&quot;.</span></span>
-<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a>    <span class="fu">names</span>(df) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Name&quot;</span>,<span class="fu">paste0</span>(dex_name,<span class="st">&quot;_Dex_Number&quot;</span>))</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Change both inputs to lower case for flexibility.</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  reg <span class="ot">&lt;-</span> <span class="fu">tolower</span>(reg)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  poke <span class="ot">&lt;-</span> <span class="fu">tolower</span>(poke)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="co"># If &quot;all&quot; is selected for the reg argument, reg is defined as all available ID numbers.</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="co"># If not reg remains what the user inputs.</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>( <span class="st">&quot;all&quot;</span> <span class="sc">%in%</span> reg){</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    reg <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>,<span class="dv">11</span><span class="sc">:</span><span class="dv">29</span>)</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  }<span class="cf">else</span>{</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    reg <span class="ot">&lt;-</span> reg</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>  }  <span class="co"># End if else statement.</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Begin Dex loop, for all Pokedexes requested.</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(a <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(reg)){</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Get the data on the specific dex.</span></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>    raw_data <span class="ot">&lt;-</span> <span class="fu">fromJSON</span>(<span class="fu">paste0</span>(<span class="st">&quot;https://pokeapi.co/api/v2/pokedex/&quot;</span>,reg[a]), <span class="at">flatten =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Save name of region</span></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>    dex_name <span class="ot">&lt;-</span> <span class="fu">str_to_sentence</span>(raw_data[[<span class="st">&quot;name&quot;</span>]])</span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Begin poke loop for every Pokemon inside of specific dex.</span></span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">dim</span>(raw_data[[<span class="st">&quot;pokemon_entries&quot;</span>]])[<span class="dv">1</span>]){</span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Save the Pokedex entry number for the Pokemon.</span></span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>      dex_num <span class="ot">&lt;-</span> raw_data[[<span class="st">&quot;pokemon_entries&quot;</span>]][i,<span class="dv">1</span>]</span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Save the name of the Pokemon.</span></span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>      nm <span class="ot">&lt;-</span> <span class="fu">str_to_sentence</span>(raw_data[[<span class="st">&quot;pokemon_entries&quot;</span>]][i,<span class="dv">2</span>])</span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Combine the entry number and the name into a tibble.</span></span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>      row_info <span class="ot">&lt;-</span> <span class="fu">tibble</span>(nm,dex_num)</span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>      <span class="co"># If first iteration of Poke loop, df is defined as the row_info tibble.</span></span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>      <span class="co"># If not first iteration, df is combined with the latest row_info tibble to add new data.</span></span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span>(i <span class="sc">==</span> <span class="dv">1</span>){</span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>        df <span class="ot">&lt;-</span> row_info</span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>      }<span class="cf">else</span>{</span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>        df <span class="ot">&lt;-</span> <span class="fu">rbind</span>(df,row_info)</span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>      } <span class="co"># End if else statement</span></span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>    } <span class="co"># End Poke loop</span></span>
+<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a>    </span>
 <span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a>    <span class="co"># If first iteration of Dex loop the final tibble is df tibble.</span></span>
-<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a>    <span class="co"># If not first iteration join final tibble and df tibble.</span></span>
-<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span>(a <span class="sc">==</span> <span class="dv">1</span>){</span>
-<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a>      final <span class="ot">&lt;-</span> df</span>
-<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a>    }<span class="cf">else</span>{</span>
-<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a>      final <span class="ot">&lt;-</span> <span class="fu">full_join</span>(final,df,<span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;Name&quot;</span><span class="ot">=</span><span class="st">&quot;Name&quot;</span>))</span>
-<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a>    } <span class="co"># End of if else statement</span></span>
-<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a>  } <span class="co"># End of Dex loop</span></span>
-<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb5-59"><a href="#cb5-59" aria-hidden="true" tabindex="-1"></a>  <span class="co"># If user specifies Pokemon, filter the final tibble by defined inputs.</span></span>
-<span id="cb5-60"><a href="#cb5-60" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="st">&quot;all&quot;</span> <span class="sc">%in%</span> <span class="fu">tolower</span>(poke)){</span>
-<span id="cb5-61"><a href="#cb5-61" aria-hidden="true" tabindex="-1"></a>    final <span class="ot">&lt;-</span> final</span>
-<span id="cb5-62"><a href="#cb5-62" aria-hidden="true" tabindex="-1"></a>  }<span class="cf">else</span>{</span>
-<span id="cb5-63"><a href="#cb5-63" aria-hidden="true" tabindex="-1"></a>    final <span class="ot">&lt;-</span> final <span class="sc">%&gt;%</span></span>
-<span id="cb5-64"><a href="#cb5-64" aria-hidden="true" tabindex="-1"></a>      <span class="fu">filter</span>(<span class="fu">tolower</span>(Name) <span class="sc">%in%</span> <span class="fu">tolower</span>(poke))</span>
-<span id="cb5-65"><a href="#cb5-65" aria-hidden="true" tabindex="-1"></a>  } <span class="co"># End of if else statement.</span></span>
-<span id="cb5-66"><a href="#cb5-66" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb5-67"><a href="#cb5-67" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Return final tibble.</span></span>
-<span id="cb5-68"><a href="#cb5-68" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(final)</span>
-<span id="cb5-69"><a href="#cb5-69" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb5-70"><a href="#cb5-70" aria-hidden="true" tabindex="-1"></a>} <span class="co"># End of function</span></span></code></pre></div>
+<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Rename columns of df tibble, as Name for the Pokemons name and</span></span>
+<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a>    <span class="co"># (dex_name)_Dex_Number, so if the National Dex is the one being put together,</span></span>
+<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a>    <span class="co"># the column will be titled &quot;National_Dex_Number&quot;.</span></span>
+<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a>    <span class="fu">names</span>(df) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Name&quot;</span>,<span class="fu">paste0</span>(dex_name,<span class="st">&quot;_Dex_Number&quot;</span>))</span>
+<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a>    <span class="co"># If first iteration of Dex loop the final tibble is df tibble.</span></span>
+<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a>    <span class="co"># If not first iteration join final tibble and df tibble.</span></span>
+<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span>(a <span class="sc">==</span> <span class="dv">1</span>){</span>
+<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a>      final <span class="ot">&lt;-</span> df</span>
+<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a>    }<span class="cf">else</span>{</span>
+<span id="cb5-59"><a href="#cb5-59" aria-hidden="true" tabindex="-1"></a>      final <span class="ot">&lt;-</span> <span class="fu">full_join</span>(final,df,<span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;Name&quot;</span><span class="ot">=</span><span class="st">&quot;Name&quot;</span>))</span>
+<span id="cb5-60"><a href="#cb5-60" aria-hidden="true" tabindex="-1"></a>    } <span class="co"># End of if else statement</span></span>
+<span id="cb5-61"><a href="#cb5-61" aria-hidden="true" tabindex="-1"></a>  } <span class="co"># End of Dex loop</span></span>
+<span id="cb5-62"><a href="#cb5-62" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-63"><a href="#cb5-63" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-64"><a href="#cb5-64" aria-hidden="true" tabindex="-1"></a>  <span class="co"># If user specifies Pokemon, filter the final tibble by defined inputs.</span></span>
+<span id="cb5-65"><a href="#cb5-65" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="st">&quot;all&quot;</span> <span class="sc">%in%</span> poke){</span>
+<span id="cb5-66"><a href="#cb5-66" aria-hidden="true" tabindex="-1"></a>    final <span class="ot">&lt;-</span> final</span>
+<span id="cb5-67"><a href="#cb5-67" aria-hidden="true" tabindex="-1"></a>  }<span class="cf">else</span>{</span>
+<span id="cb5-68"><a href="#cb5-68" aria-hidden="true" tabindex="-1"></a>    final <span class="ot">&lt;-</span> final <span class="sc">%&gt;%</span></span>
+<span id="cb5-69"><a href="#cb5-69" aria-hidden="true" tabindex="-1"></a>      <span class="fu">filter</span>(<span class="fu">tolower</span>(Name) <span class="sc">%in%</span> poke)</span>
+<span id="cb5-70"><a href="#cb5-70" aria-hidden="true" tabindex="-1"></a>  } <span class="co"># End of if else statement.</span></span>
+<span id="cb5-71"><a href="#cb5-71" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-72"><a href="#cb5-72" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Return final tibble.</span></span>
+<span id="cb5-73"><a href="#cb5-73" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(final)</span>
+<span id="cb5-74"><a href="#cb5-74" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-75"><a href="#cb5-75" aria-hidden="true" tabindex="-1"></a>} <span class="co"># End of function</span></span></code></pre></div>
 <p>Here is the relationship between the region names and their ID numbers.</p>
 <table>
 <thead>
@@ -419,13 +425,135 @@ body {
 </tr>
 </tbody>
 </table>
-<h2 id="basic-functionality">Basic Functionality</h2>
-<p>Here we test the encounter function with my favorite starter Pokemon <strong>CHARMANDER</strong>.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use the function and save results in an object</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>charmander <span class="ot">&lt;-</span> <span class="fu">encounter</span>(<span class="st">&quot;charmander&quot;</span>)</span>
+<h2 id="egg-group-function">Egg Group Function</h2>
+<p>Another way to get new Pokemon is to breed the ones you already have. Pokemon can only breed with other Pokemon in their specific egg groups. For more information on egg groups click <a href="https://bulbapedia.bulbagarden.net/wiki/Egg_Group">here</a>. If you have a Pokemon and you want to know what egg group it is in for breeding purposes you can use the <code>egg_group</code> function!</p>
+<p>This function is designed to return a tibble with the Pokemons name and two columns of egg group data with it. The function takes two arguments and both are optional. The first is <code>group</code> which is for if the user wants to specify which egg group(s) data is returned on. If no argument is given then all groups will be returned. The inputs can be the character string for the name of the group or the id number for the group. This can be a single argument or a vector of them. The relationship between the names and ids will be shown after the function is built.</p>
+<p>The second argument is <code>poke</code> which is if the user wants the data for only specific Pokemon. The function defaults to all Pokemon available in the selects group(s). The input can be either a single character string or a vector of them.</p>
+<p>Every Pokemon belongs to at least one egg group even if that group is “no eggs”. Some Pokemon will belong to two different egg groups, so the function is designed to always return two columns of egg groups, however if the specific Pokemon only belongs to one the second column will be <code>NA</code>. This is also true if the second egg group for the Pokemon is never searched.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Build function</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>egg_group <span class="ot">&lt;-</span> <span class="cf">function</span>(<span class="at">group =</span> <span class="st">&quot;all&quot;</span>, <span class="at">poke =</span> <span class="st">&quot;all&quot;</span>){</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Print the object</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(charmander)</span></code></pre></div>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Change inputs to lower to case to allow for some flexibility.</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  group <span class="ot">&lt;-</span> <span class="fu">tolower</span>(group)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  poke  <span class="ot">&lt;-</span> <span class="fu">tolower</span>(poke)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># If group is all, we change what group is defined as to the numbers for every egg group id.</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="co"># If group is not all, group remains unchanged</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(group <span class="sc">==</span> <span class="st">&quot;all&quot;</span>){</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    group <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">15</span>)</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  }<span class="cf">else</span>{</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    group <span class="ot">&lt;-</span> group</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>  } <span class="co"># End if else statement</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Begin loop for specific egg group.</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(group)) {</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Get the data we need from API.</span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>raw_data <span class="ot">&lt;-</span> <span class="fu">fromJSON</span>(<span class="fu">paste0</span>(<span class="st">&quot;https://pokeapi.co/api/v2/egg-group/&quot;</span>,group[i]))</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Save the name of the egg group as grp.</span></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>grp <span class="ot">&lt;-</span> raw_data<span class="sc">$</span>name</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>   <span class="co"># Begin loop for Pokemon inside of egg group.</span></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>   <span class="cf">for</span>(a <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">dim</span>(raw_data<span class="sc">$</span>pokemon_species)[<span class="dv">1</span>]){</span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>     </span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>     <span class="co"># Save the name of the Pokemon as name.</span></span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>     name <span class="ot">&lt;-</span> raw_data<span class="sc">$</span>pokemon_species[a,<span class="dv">1</span>]</span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>     </span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>     <span class="co"># Create tibble with the name of the Pokemon and egg group.</span></span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>     row_info <span class="ot">&lt;-</span> <span class="fu">tibble</span>(name,grp)</span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>     </span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>     <span class="co"># If first iteration of Pokemon loop, the df tibble is defined as the row_info tibble.</span></span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>     <span class="co"># If not first iteration, the df binded with row_info to add more inforamtion.</span></span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>     <span class="cf">if</span>(a <span class="sc">==</span> <span class="dv">1</span>){</span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a>       df <span class="ot">&lt;-</span> row_info</span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a>     } <span class="cf">else</span>{</span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a>       df <span class="ot">&lt;-</span> <span class="fu">rbind</span>(df,row_info)</span>
+<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a>     } <span class="co"># End of if else statement</span></span>
+<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a>   } <span class="co"># End of Pokemon for loop</span></span>
+<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Changing the names of the columns for easy joining.</span></span>
+<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a>    <span class="co"># The new column of egg groups is called _iteration with the iteration of the</span></span>
+<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a>    <span class="co"># egg group loop included before the _, this is to not overwrite previous data collected.</span></span>
+<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a>    <span class="fu">names</span>(df) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;name&quot;</span>,<span class="fu">paste0</span>(i,<span class="st">&quot;_iteration&quot;</span>))</span>
+<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a>     <span class="co"># If first iteration of egg group loop, the df2 tibble is defined as the most recent df tibble.</span></span>
+<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a>     <span class="co"># If not first iteration, the df2 tibble is full joined with df to add new data.</span></span>
+<span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a> <span class="cf">if</span>(i <span class="sc">==</span> <span class="dv">1</span>){</span>
+<span id="cb6-51"><a href="#cb6-51" aria-hidden="true" tabindex="-1"></a>  df2 <span class="ot">&lt;-</span> df</span>
+<span id="cb6-52"><a href="#cb6-52" aria-hidden="true" tabindex="-1"></a> }<span class="cf">else</span>{</span>
+<span id="cb6-53"><a href="#cb6-53" aria-hidden="true" tabindex="-1"></a>  df2 <span class="ot">&lt;-</span> <span class="fu">full_join</span>(df2,df, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;name&quot;</span><span class="ot">=</span> <span class="st">&quot;name&quot;</span>)) </span>
+<span id="cb6-54"><a href="#cb6-54" aria-hidden="true" tabindex="-1"></a> } <span class="co"># End of if else statement.</span></span>
+<span id="cb6-55"><a href="#cb6-55" aria-hidden="true" tabindex="-1"></a>} <span class="co"># End of egg group loop.</span></span>
+<span id="cb6-56"><a href="#cb6-56" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb6-57"><a href="#cb6-57" aria-hidden="true" tabindex="-1"></a>  <span class="co"># After the egg group loop is completed we are left with a tibble that is not</span></span>
+<span id="cb6-58"><a href="#cb6-58" aria-hidden="true" tabindex="-1"></a>  <span class="co"># very descriptive and contains a lot of NAs. This section below helps to clean </span></span>
+<span id="cb6-59"><a href="#cb6-59" aria-hidden="true" tabindex="-1"></a>  <span class="co"># data for return.</span></span>
+<span id="cb6-60"><a href="#cb6-60" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb6-61"><a href="#cb6-61" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Begin cleaning loop.</span></span>
+<span id="cb6-62"><a href="#cb6-62" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span>(b <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">dim</span>(df2)[<span class="dv">1</span>]){</span>
+<span id="cb6-63"><a href="#cb6-63" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb6-64"><a href="#cb6-64" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Find columns for row b that are not NA and return a vector of 1s and 0s.</span></span>
+<span id="cb6-65"><a href="#cb6-65" aria-hidden="true" tabindex="-1"></a>      row_na_info <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="sc">!</span><span class="fu">is.na</span>(df2[b,]))</span>
+<span id="cb6-66"><a href="#cb6-66" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb6-67"><a href="#cb6-67" aria-hidden="true" tabindex="-1"></a>      <span class="co"># This finds what position in the df2 tibble was not NA.</span></span>
+<span id="cb6-68"><a href="#cb6-68" aria-hidden="true" tabindex="-1"></a>      not_na <span class="ot">&lt;-</span> <span class="fu">which</span>(row_na_info <span class="sc">%in%</span> <span class="dv">1</span>)</span>
+<span id="cb6-69"><a href="#cb6-69" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb6-70"><a href="#cb6-70" aria-hidden="true" tabindex="-1"></a>      <span class="co"># The first non NA is always the name, this is save as nm.</span></span>
+<span id="cb6-71"><a href="#cb6-71" aria-hidden="true" tabindex="-1"></a>      nm <span class="ot">&lt;-</span> df2[b,not_na[<span class="dv">1</span>]]</span>
+<span id="cb6-72"><a href="#cb6-72" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb6-73"><a href="#cb6-73" aria-hidden="true" tabindex="-1"></a>      <span class="co"># The second non NA is the first egg group for a Pokemon.</span></span>
+<span id="cb6-74"><a href="#cb6-74" aria-hidden="true" tabindex="-1"></a>      <span class="co"># This is saved as group1.</span></span>
+<span id="cb6-75"><a href="#cb6-75" aria-hidden="true" tabindex="-1"></a>      group1 <span class="ot">&lt;-</span> df2[b,not_na[<span class="dv">2</span>]]</span>
+<span id="cb6-76"><a href="#cb6-76" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb6-77"><a href="#cb6-77" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Not all Pokemon have two egg groups this if else statement accounts for that.</span></span>
+<span id="cb6-78"><a href="#cb6-78" aria-hidden="true" tabindex="-1"></a>      <span class="co"># If there are three columns of non NA, group2 is defined as the second egg group.</span></span>
+<span id="cb6-79"><a href="#cb6-79" aria-hidden="true" tabindex="-1"></a>      <span class="co"># If there are not three NA free columns, group2 is defined as NA.</span></span>
+<span id="cb6-80"><a href="#cb6-80" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span>(<span class="fu">length</span>(not_na) <span class="sc">==</span> <span class="dv">3</span>){</span>
+<span id="cb6-81"><a href="#cb6-81" aria-hidden="true" tabindex="-1"></a>        group2 <span class="ot">&lt;-</span> df2[b,not_na[<span class="dv">3</span>]]</span>
+<span id="cb6-82"><a href="#cb6-82" aria-hidden="true" tabindex="-1"></a>      }<span class="cf">else</span>{</span>
+<span id="cb6-83"><a href="#cb6-83" aria-hidden="true" tabindex="-1"></a>        group2 <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb6-84"><a href="#cb6-84" aria-hidden="true" tabindex="-1"></a>      } <span class="co"># End of if else statement.</span></span>
+<span id="cb6-85"><a href="#cb6-85" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb6-86"><a href="#cb6-86" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Create new_row tibble, with cleaned name and egg group(s).</span></span>
+<span id="cb6-87"><a href="#cb6-87" aria-hidden="true" tabindex="-1"></a>      new_row <span class="ot">&lt;-</span> <span class="fu">tibble</span>(nm,group1,group2)</span>
+<span id="cb6-88"><a href="#cb6-88" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb6-89"><a href="#cb6-89" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Rename columns</span></span>
+<span id="cb6-90"><a href="#cb6-90" aria-hidden="true" tabindex="-1"></a>      <span class="fu">names</span>(new_row) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Name&quot;</span>,<span class="st">&quot;Egg_Group_1&quot;</span>,<span class="st">&quot;Egg_Group_2&quot;</span>)</span>
+<span id="cb6-91"><a href="#cb6-91" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb6-92"><a href="#cb6-92" aria-hidden="true" tabindex="-1"></a>      <span class="co"># If first iteration of cleaning loop, df3 is defined as the new_row tibble.</span></span>
+<span id="cb6-93"><a href="#cb6-93" aria-hidden="true" tabindex="-1"></a>      <span class="co"># If not first iteration df3 is binded with new_row to add new data.</span></span>
+<span id="cb6-94"><a href="#cb6-94" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span>(b <span class="sc">==</span> <span class="dv">1</span>){</span>
+<span id="cb6-95"><a href="#cb6-95" aria-hidden="true" tabindex="-1"></a>      df3 <span class="ot">&lt;-</span> new_row</span>
+<span id="cb6-96"><a href="#cb6-96" aria-hidden="true" tabindex="-1"></a>      }<span class="cf">else</span>{</span>
+<span id="cb6-97"><a href="#cb6-97" aria-hidden="true" tabindex="-1"></a>      df3 <span class="ot">&lt;-</span> <span class="fu">rbind</span>(df3,new_row)</span>
+<span id="cb6-98"><a href="#cb6-98" aria-hidden="true" tabindex="-1"></a>    } <span class="co"># End of if else statement.</span></span>
+<span id="cb6-99"><a href="#cb6-99" aria-hidden="true" tabindex="-1"></a>} <span class="co"># End of cleaning loop</span></span>
+<span id="cb6-100"><a href="#cb6-100" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-101"><a href="#cb6-101" aria-hidden="true" tabindex="-1"></a>  <span class="co"># If user didn&#39;t specify Pokemon to return, the final tibble is defined as the most recent df3.</span></span>
+<span id="cb6-102"><a href="#cb6-102" aria-hidden="true" tabindex="-1"></a>  <span class="co"># If user did specify df3 is filtered for the Pokemon and saved as the final tibble.</span></span>
+<span id="cb6-103"><a href="#cb6-103" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="st">&quot;all&quot;</span> <span class="sc">%in%</span> poke){</span>
+<span id="cb6-104"><a href="#cb6-104" aria-hidden="true" tabindex="-1"></a>    final <span class="ot">&lt;-</span> df3</span>
+<span id="cb6-105"><a href="#cb6-105" aria-hidden="true" tabindex="-1"></a>  }<span class="cf">else</span>{</span>
+<span id="cb6-106"><a href="#cb6-106" aria-hidden="true" tabindex="-1"></a>    final <span class="ot">&lt;-</span> df3 <span class="sc">%&gt;%</span></span>
+<span id="cb6-107"><a href="#cb6-107" aria-hidden="true" tabindex="-1"></a>      <span class="fu">filter</span>(Name <span class="sc">%in%</span> poke)</span>
+<span id="cb6-108"><a href="#cb6-108" aria-hidden="true" tabindex="-1"></a>  } <span class="co"># End of if else statement.</span></span>
+<span id="cb6-109"><a href="#cb6-109" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb6-110"><a href="#cb6-110" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Capitalize first letter of Pokemon name to match rest of functions.</span></span>
+<span id="cb6-111"><a href="#cb6-111" aria-hidden="true" tabindex="-1"></a>  final<span class="sc">$</span>Name <span class="ot">&lt;-</span> <span class="fu">str_to_sentence</span>(final<span class="sc">$</span>Name)</span>
+<span id="cb6-112"><a href="#cb6-112" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb6-113"><a href="#cb6-113" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Return final tibble to user. </span></span>
+<span id="cb6-114"><a href="#cb6-114" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(final)</span>
+<span id="cb6-115"><a href="#cb6-115" aria-hidden="true" tabindex="-1"></a>} <span class="co"># End of function</span></span></code></pre></div>
+<h1 id="basic-functionality">Basic Functionality</h1>
+<p>Below we show as basic example of each function.</p>
+<h2 id="encounter-example">Encounter Example</h2>
+<p>Here we test the encounter function with my favorite starter Pokemon <strong>CHARMANDER</strong>.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use the function and save results in an object</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>charmander <span class="ot">&lt;-</span> <span class="fu">encounter</span>(<span class="st">&quot;charmander&quot;</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Print the object</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(charmander)</span></code></pre></div>
 <pre><code>## # A tibble: 9 x 6
 ##   Location            Game       Chance Max_Level Min_Level Method
 ##   &lt;chr&gt;               &lt;chr&gt;       &lt;int&gt;     &lt;int&gt;     &lt;int&gt; &lt;chr&gt; 
@@ -438,15 +566,16 @@ body {
 ## 7 kanto-route-24-area yellow        100        10        10 gift  
 ## 8 lumiose-city-area   x             100        10        10 gift  
 ## 9 lumiose-city-area   y             100        10        10 gift</code></pre>
+<h2 id="stats-example">Stats Example</h2>
 <p>Here is an example of the <code>stats</code> function, with a vector of four Pokemon.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a vector of four Pokemon</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>mons <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;charizard&quot;</span>,<span class="st">&quot;pidgey&quot;</span>,<span class="st">&quot;abra&quot;</span>,<span class="st">&quot;beedrill&quot;</span>) </span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Use the function on the vector</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>stat_example <span class="ot">&lt;-</span> <span class="fu">stats</span>(mons)</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Print results</span></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(stat_example)</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a vector of four Pokemon</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>mons <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;charizard&quot;</span>,<span class="st">&quot;pidgey&quot;</span>,<span class="st">&quot;abra&quot;</span>,<span class="st">&quot;beedrill&quot;</span>) </span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Use the function on the vector</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>stat_example <span class="ot">&lt;-</span> <span class="fu">stats</span>(mons)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Print results</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(stat_example)</span></code></pre></div>
 <pre><code>## # A tibble: 4 x 7
 ##   name         hp attack defense `special-attack` `special-defense` speed
 ##   &lt;chr&gt;     &lt;int&gt;  &lt;int&gt;   &lt;int&gt;            &lt;int&gt;             &lt;int&gt; &lt;int&gt;
@@ -454,12 +583,13 @@ body {
 ## 2 Pidgey       40     45      40               35                35    56
 ## 3 Abra         25     20      15              105                55    90
 ## 4 Beedrill     65     90      40               45                80    75</code></pre>
+<h2 id="size-example">Size Example</h2>
 <p>Here we test the <code>size</code> function, with the same vector of four Pokemon from the <code>stats</code> example.</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use the function on the vector</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>size_example <span class="ot">&lt;-</span> <span class="fu">size</span>(mons)</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Print results</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(size_example)</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use the function on the vector</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>size_example <span class="ot">&lt;-</span> <span class="fu">size</span>(mons)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Print results</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(size_example)</span></code></pre></div>
 <pre><code>## # A tibble: 4 x 3
 ##   Name      Height_Meters Weight_Kilograms
 ##   &lt;chr&gt;             &lt;dbl&gt;            &lt;dbl&gt;
@@ -467,12 +597,13 @@ body {
 ## 2 Pidgey              0.3              1.8
 ## 3 Abra                0.9             19.5
 ## 4 Beedrill            1               29.5</code></pre>
-<p>Here we test the <code>dex</code> function. We are using regions with dex ids 1 through 5, and only returning results on our same four Pokemon from the previous two examples. Any <code>N/A</code> means that the Pokemon is not in that Pokedex.</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use function on vectors</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>dex_example <span class="ot">&lt;-</span> <span class="fu">dex</span>(<span class="at">reg =</span> <span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>), <span class="at">poke =</span> mons)</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Print results</span></span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(dex_example)</span></code></pre></div>
+<h2 id="dex-example">Dex Example</h2>
+<p>Here we test the <code>dex</code> function. We are using regions with dex ids 1 through 5, and only returning results on our same four Pokemon from the previous two examples. Any <code>NA</code> means that the Pokemon is not in that Pokedex.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use function on vectors</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>dex_example <span class="ot">&lt;-</span> <span class="fu">dex</span>(<span class="at">reg =</span> <span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>), <span class="at">poke =</span> mons)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Print results</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(dex_example)</span></code></pre></div>
 <pre><code>## # A tibble: 4 x 6
 ##   Name      National_Dex_Number Kanto_Dex_Number `Original-johto_Dex_Number` Hoenn_Dex_Number `Original-sinnoh_Dex_Number`
 ##   &lt;chr&gt;                   &lt;int&gt;            &lt;int&gt;                       &lt;int&gt;            &lt;int&gt;                        &lt;int&gt;
@@ -480,6 +611,20 @@ body {
 ## 2 Beedrill                   15               15                          29               NA                           NA
 ## 3 Pidgey                     16               16                          10               NA                           NA
 ## 4 Abra                       63               63                          89               39                           20</code></pre>
+<h2 id="egg-group-example">Egg Group Example</h2>
+<p>Here we test the <code>egg_group</code> function. We are using all egg groups, and returning the information for the Pokemon in our <code>mons</code> vector that we have been using. Any <code>NA</code> means the Pokemon doesn’t have a second egg group.</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use function on mons vector.</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>egg_example <span class="ot">&lt;-</span> <span class="fu">egg_group</span>(<span class="at">group =</span> <span class="st">&quot;all&quot;</span>, <span class="at">poke =</span> mons)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Return the tibble.</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(egg_example)</span></code></pre></div>
+<pre><code>## # A tibble: 4 x 3
+##   Name      Egg_Group_1 Egg_Group_2
+##   &lt;chr&gt;     &lt;chr&gt;       &lt;chr&gt;      
+## 1 Charizard monster     dragon     
+## 2 Beedrill  bug         &lt;NA&gt;       
+## 3 Pidgey    flying      &lt;NA&gt;       
+## 4 Abra      humanshape  &lt;NA&gt;</code></pre>
 
 </body>
 </html>

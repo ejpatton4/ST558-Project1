@@ -2,37 +2,133 @@ library(httr)
 library(jsonlite)
 library(tidyverse)
 
+blue <- c(1:5)
+
+blue <- tolower(blue)
+
+dim(raw_data$pokemon_species)[1]
 
 
-raw_data <- fromJSON("https://pokeapi.co/api/v2/pokedex/1")
+group <- c(2,1,5)
+
+length(group)
 
 
+egg_group <- function(group = "all", poke = "all"){
 
-get_all_ids <- function(x){
   
-  for(i in 1:length(x)){
-    
-  raw_data <- fromJSON(paste0("https://pokeapi.co/api/v2/pokedex/",x[i]))
+  group <- tolower(group)
+  poke  <- tolower(poke)
   
-  region_id <- raw_data[["id"]]
+  if(group == "all"){
+    group <- c(1:15)
+  }else{
+    group <- group
+  }
   
-  region_name <- raw_data[["name"]]
   
-  df <- tibble(region_id,region_name)
+for(i in 1:length(group)) {
+  
+raw_data <- fromJSON(paste0("https://pokeapi.co/api/v2/egg-group/",group[i]))
+
+grp <- raw_data$name
+
+   for(a in 1:dim(raw_data$pokemon_species)[1]){
+     
+     name <- raw_data$pokemon_species[a,1]
+     
+     
+     row_info <- tibble(name,grp)
+     
+     
+     if(a == 1){
+       df <- row_info
+     } else{
+       df <- rbind(df,row_info)
+     }
+     
+   }
+
+    names(df) <- c("name",paste0(i,"_iteration"))
+
+ if(i == 1){
+  df2 <- df
+ }else{
+  df2 <- full_join(df2,df, by = c("name"= "name")) 
+ }
+}
+    for(b in 1:dim(df2)[1]){
+      
+      row_na_info <- as.numeric(!is.na(df2[b,]))
+      
+      not_na <- which(row_na_info %in% 1)
+      
+      nm <- df2[b,not_na[1]]
+      
+      group1 <- df2[b,not_na[2]]
+      
+      if(length(not_na) == 3){
+        group2 <- df2[b,not_na[3]]
+      }else{
+        group2 <- NA
+      }
+      
+      new_row <- tibble(nm,group1,group2)
+      
+      names(new_row) <- c("Name","Egg_Group_1","Egg_Group_2")
+      
+      if(b == 1){
+      df3 <- new_row
+      }else{
+      df3 <- rbind(df3,new_row)
+    }
+}
+
+  
+  if("all" %in% poke){
+    final <- df3
+  }else{
+    final <- df3 %>%
+      filter(Name %in% poke)
+  }
+  
+  
+  final$Name <- str_to_sentence(final$Name)
+  
+  return(final)
+}
+
+
+
+
+
+groups <- fromJSON("https://pokeapi.co/api/v2/egg-group/")
+
+
+# FiNISH THIS TABLE ASAP
+  
+raw_data <- fromJSON("https://pokeapi.co/api/v2/egg-group/")
+
+for(i in 1:length(raw_data$results[["name"]])){
+  
+  group_ids <- c(1:15)
+  
+  group_id <- group_ids[i]
+  
+  group_name <-  raw_data$results[["name"]][i]
+  
+  
+  group_row_info <- tibble(group_id,group_name)
   
   if(i == 1){
-    final <- df
+    group_tibble <- group_row_info
   }else{
-    final <- rbind(final,df)
+    group_tibble <- rbind(group_tibble,group_name)
   }
   
-  }
-  return(final)
 }
 
-
-get_all_ids(c(1:9,11:29))
-
+#kable(group_tibble)
 
 
 
@@ -40,76 +136,32 @@ get_all_ids(c(1:9,11:29))
 
 
 
-
-dex <- function(reg = 1,poke = "all"){
-  
-  if( "all" %in% tolower(reg)){
-    
-    reg <- c(1:9,11:29)
-  }else{
-    reg <- reg
-  }
-  
-  
-  for(a in 1:length(reg)){
-    
-    raw_data <- fromJSON(paste0("https://pokeapi.co/api/v2/pokedex/",reg[a]), flatten = TRUE)
-    
-    dex_name <- str_to_sentence(raw_data[["name"]])
-    
-    for(i in 1:dim(raw_data[["pokemon_entries"]])[1]){
-      
-      
-      dex_num <- raw_data[["pokemon_entries"]][i,1]
-      nm <- str_to_sentence(raw_data[["pokemon_entries"]][i,2])
-      
-      
-      row_info <- tibble(nm,dex_num)
-      
-      if(i == 1){
-        df <- row_info
-      }else{
-        df <- rbind(df,row_info)
-      }
-    }
-    
-    
-    
-    names(df) <- c("Name",paste0(dex_name,"_Dex_Number"))
-    
-    
-    
-    if(a == 1){
-      
-      final <- df
-    }else{
-      final <- full_join(final,df,by = c("Name"="Name"))
-    }
-  }
-  
-  if("all" %in% tolower(poke)){
-    final <- final
-  }else{
-    final <- final %>%
-      filter(tolower(Name) %in% poke)
-  }
-  return(final)
-}
-
-yell <- c(5:1)
-
-test <- dex(c(1,2),c("charizard","pidgey"))
+test <- egg_group()
 
 
-reg <- c(1:10)
 
-if("all" %in% reg){
-  
-  reg <- c(1:21)
-}else{
-  reg <- reg
-}
 
-length(reg)
+dim(final)[1]
 
+row_na_info <- !is.na(final[1,])
+
+row_na_info <- as.numeric(row_na_info)
+
+not_na <- which(row_na_info %in% 1)
+
+name <- final[1,(not_na[1])]
+
+group_1 <- final[1,(not_na[2])]
+
+group_2 <- final[1,(not_na[3])]
+
+
+new_row <- tibble(name,group_1,group_2)
+
+
+str(row_na_info)
+typeof(row_na_info)
+
+final <- final %>%
+  mutate(Egg_Group_1 = )
 

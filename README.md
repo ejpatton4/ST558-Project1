@@ -27,6 +27,8 @@ library(tidyverse)
 library(knitr)
 ```
 
+# Building the Functions
+
 ## Encounter Function
 
 Pokemon fans around the world, myself included, know the catch phrase
@@ -208,7 +210,7 @@ the `size` function. The `size` function takes a single argument, `poke`
 that can be either a single character string of a Pokemon name, or a
 vector of names if you wanted the information on more than one Pokemon.
 
-The output of the `stats` function is a tibble with the Pokemons name,
+The output of the `size` function is a tibble with the Pokemons name,
 Height in meters, and Weight in kilograms.
 
 ``` r
@@ -283,9 +285,14 @@ THE `reg` ARGUMENT, THE FUNCTION WILL NOT WORK.**
 # Define function
 dex <- function(reg = 1,poke = "all"){
   
+  # Change both inputs to lower case for flexibility.
+  reg <- tolower(reg)
+  poke <- tolower(poke)
+  
+  
   # If "all" is selected for the reg argument, reg is defined as all available ID numbers.
   # If not reg remains what the user inputs.
-  if( "all" %in% tolower(reg)){
+  if( "all" %in% reg){
     reg <- c(1:9,11:29)
   }else{
     reg <- reg
@@ -339,11 +346,11 @@ dex <- function(reg = 1,poke = "all"){
   
   
   # If user specifies Pokemon, filter the final tibble by defined inputs.
-  if("all" %in% tolower(poke)){
+  if("all" %in% poke){
     final <- final
   }else{
     final <- final %>%
-      filter(tolower(Name) %in% tolower(poke))
+      filter(tolower(Name) %in% poke)
   } # End of if else statement.
   
   # Return final tibble.
@@ -385,7 +392,160 @@ Here is the relationship between the region names and their ID numbers.
 |         28 | isle-of-armor     |
 |         29 | crown-tundra      |
 
-## Basic Functionality
+## Egg Group Function
+
+Another way to get new Pokemon is to breed the ones you already have.
+Pokemon can only breed with other Pokemon in their specific egg groups.
+For more information on egg groups click
+[here](https://bulbapedia.bulbagarden.net/wiki/Egg_Group). If you have a
+Pokemon and you want to know what egg group it is in for breeding
+purposes you can use the `egg_group` function!
+
+This function is designed to return a tibble with the Pokemons name and
+two columns of egg group data with it. The function takes two arguments
+and both are optional. The first is `group` which is for if the user
+wants to specify which egg group(s) data is returned on. If no argument
+is given then all groups will be returned. The inputs can be the
+character string for the name of the group or the id number for the
+group. This can be a single argument or a vector of them. The
+relationship between the names and ids will be shown after the function
+is built.
+
+The second argument is `poke` which is if the user wants the data for
+only specific Pokemon. The function defaults to all Pokemon available in
+the selects group(s). The input can be either a single character string
+or a vector of them.
+
+Every Pokemon belongs to at least one egg group even if that group is
+“no eggs”. Some Pokemon will belong to two different egg groups, so the
+function is designed to always return two columns of egg groups, however
+if the specific Pokemon only belongs to one the second column will be
+`NA`. This is also true if the second egg group for the Pokemon is never
+searched.
+
+``` r
+# Build function
+egg_group <- function(group = "all", poke = "all"){
+
+  # Change inputs to lower to case to allow for some flexibility.
+  group <- tolower(group)
+  poke  <- tolower(poke)
+  
+  # If group is all, we change what group is defined as to the numbers for every egg group id.
+  # If group is not all, group remains unchanged
+  if(group == "all"){
+    group <- c(1:15)
+  }else{
+    group <- group
+  } # End if else statement
+  
+  # Begin loop for specific egg group.
+for(i in 1:length(group)) {
+  
+  # Get the data we need from API.
+raw_data <- fromJSON(paste0("https://pokeapi.co/api/v2/egg-group/",group[i]))
+
+  # Save the name of the egg group as grp.
+grp <- raw_data$name
+
+   # Begin loop for Pokemon inside of egg group.
+   for(a in 1:dim(raw_data$pokemon_species)[1]){
+     
+     # Save the name of the Pokemon as name.
+     name <- raw_data$pokemon_species[a,1]
+     
+     # Create tibble with the name of the Pokemon and egg group.
+     row_info <- tibble(name,grp)
+     
+     # If first iteration of Pokemon loop, the df tibble is defined as the row_info tibble.
+     # If not first iteration, the df binded with row_info to add more inforamtion.
+     if(a == 1){
+       df <- row_info
+     } else{
+       df <- rbind(df,row_info)
+     } # End of if else statement
+   } # End of Pokemon for loop
+
+    # Changing the names of the columns for easy joining.
+    # The new column of egg groups is called _iteration with the iteration of the
+    # egg group loop included before the _, this is to not overwrite previous data collected.
+    names(df) <- c("name",paste0(i,"_iteration"))
+
+     # If first iteration of egg group loop, the df2 tibble is defined as the most recent df tibble.
+     # If not first iteration, the df2 tibble is full joined with df to add new data.
+ if(i == 1){
+  df2 <- df
+ }else{
+  df2 <- full_join(df2,df, by = c("name"= "name")) 
+ } # End of if else statement.
+} # End of egg group loop.
+  
+  # After the egg group loop is completed we are left with a tibble that is not
+  # very descriptive and contains a lot of NAs. This section below helps to clean 
+  # data for return.
+  
+  # Begin cleaning loop.
+    for(b in 1:dim(df2)[1]){
+      
+      # Find columns for row b that are not NA and return a vector of 1s and 0s.
+      row_na_info <- as.numeric(!is.na(df2[b,]))
+      
+      # This finds what position in the df2 tibble was not NA.
+      not_na <- which(row_na_info %in% 1)
+      
+      # The first non NA is always the name, this is save as nm.
+      nm <- df2[b,not_na[1]]
+      
+      # The second non NA is the first egg group for a Pokemon.
+      # This is saved as group1.
+      group1 <- df2[b,not_na[2]]
+      
+      # Not all Pokemon have two egg groups this if else statement accounts for that.
+      # If there are three columns of non NA, group2 is defined as the second egg group.
+      # If there are not three NA free columns, group2 is defined as NA.
+      if(length(not_na) == 3){
+        group2 <- df2[b,not_na[3]]
+      }else{
+        group2 <- NA
+      } # End of if else statement.
+      
+      # Create new_row tibble, with cleaned name and egg group(s).
+      new_row <- tibble(nm,group1,group2)
+      
+      # Rename columns
+      names(new_row) <- c("Name","Egg_Group_1","Egg_Group_2")
+      
+      # If first iteration of cleaning loop, df3 is defined as the new_row tibble.
+      # If not first iteration df3 is binded with new_row to add new data.
+      if(b == 1){
+      df3 <- new_row
+      }else{
+      df3 <- rbind(df3,new_row)
+    } # End of if else statement.
+} # End of cleaning loop
+
+  # If user didn't specify Pokemon to return, the final tibble is defined as the most recent df3.
+  # If user did specify df3 is filtered for the Pokemon and saved as the final tibble.
+  if("all" %in% poke){
+    final <- df3
+  }else{
+    final <- df3 %>%
+      filter(Name %in% poke)
+  } # End of if else statement.
+  
+  # Capitalize first letter of Pokemon name to match rest of functions.
+  final$Name <- str_to_sentence(final$Name)
+  
+  # Return final tibble to user. 
+  return(final)
+} # End of function
+```
+
+# Basic Functionality
+
+Below we show as basic example of each function.
+
+## Encounter Example
 
 Here we test the encounter function with my favorite starter Pokemon
 **CHARMANDER**.
@@ -411,6 +571,8 @@ print(charmander)
     ## 8 lumiose-city-area   x             100        10        10 gift  
     ## 9 lumiose-city-area   y             100        10        10 gift
 
+## Stats Example
+
 Here is an example of the `stats` function, with a vector of four
 Pokemon.
 
@@ -433,6 +595,8 @@ print(stat_example)
     ## 3 Abra         25     20      15              105                55    90
     ## 4 Beedrill     65     90      40               45                80    75
 
+## Size Example
+
 Here we test the `size` function, with the same vector of four Pokemon
 from the `stats` example.
 
@@ -452,9 +616,11 @@ print(size_example)
     ## 3 Abra                0.9             19.5
     ## 4 Beedrill            1               29.5
 
+## Dex Example
+
 Here we test the `dex` function. We are using regions with dex ids 1
 through 5, and only returning results on our same four Pokemon from the
-previous two examples. Any `N/A` means that the Pokemon is not in that
+previous two examples. Any `NA` means that the Pokemon is not in that
 Pokedex.
 
 ``` r
@@ -472,3 +638,26 @@ print(dex_example)
     ## 2 Beedrill                   15               15                          29               NA                           NA
     ## 3 Pidgey                     16               16                          10               NA                           NA
     ## 4 Abra                       63               63                          89               39                           20
+
+## Egg Group Example
+
+Here we test the `egg_group` function. We are using all egg groups, and
+returning the information for the Pokemon in our `mons` vector that we
+have been using. Any `NA` means the Pokemon doesn’t have a second egg
+group.
+
+``` r
+# Use function on mons vector.
+egg_example <- egg_group(group = "all", poke = mons)
+
+# Return the tibble.
+print(egg_example)
+```
+
+    ## # A tibble: 4 x 3
+    ##   Name      Egg_Group_1 Egg_Group_2
+    ##   <chr>     <chr>       <chr>      
+    ## 1 Charizard monster     dragon     
+    ## 2 Beedrill  bug         <NA>       
+    ## 3 Pidgey    flying      <NA>       
+    ## 4 Abra      humanshape  <NA>
