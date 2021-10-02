@@ -14,7 +14,8 @@ In this Vignette we will need the following packages:
 
 ``` r
 # You only need to run the install.packages() functions if you have not already downloaded the packages. 
-# As I already have them downloaded, I am not doing that here. If you need to, copy and paste the line needed, without the #, into your console and run.
+# As I already have them downloaded, I am not doing that here. 
+# If you need to, copy and paste the line needed, without the #, into your console and run.
 
 # install.packages("tidyverse")
 # install.packages("httr")
@@ -562,9 +563,158 @@ numbers and their associated names.
 |        14 | dragon        |
 |        15 | no-eggs       |
 
+## Experience Function
+
+When Pokemon battle they gain experience. This experience can make the
+Pokemon grow to a new level, when Pokemon reach a new level they upgrade
+their base stats that we looked at earlier and they can even evolve into
+new Pokemon.
+
+Every Pokemon has a certain formula that defines how much experience it
+takes to get to the next level. These formulas can be read about
+[here](https://bulbapedia.bulbagarden.net/wiki/Experience). If you were
+interested in a question along the lines of “How much experience does it
+take for my Pokemon to reach level 50?” you can use the `exp_func`!
+
+`exp_func` is deigned to return a tibble with the Pokemons name, the
+name of the level formula used, and the experience needed to reach
+levels 1 through 100 (the maximum for every Pokemon). The function takes
+three arguments `rate`, `poke`, and `level`, all arguments are optional
+as they default to “all”. They also all can take a single input or a
+vector of them.
+
+`rate` is for the specific experience formulas you want to return data
+on, if you were wondering what Pokemon were in a certain formula group.
+You can define this as the name of the rate or the id number, the
+relationship between these will be shown after.
+
+`poke` is for if you only want to return the data on specific Pokemon.
+
+`level` is for what levels you would like to return data on, if not all.
+So if you wanted levels 10, 20, 30….level = c(10,20,30), would return
+the data for those levels.
+
+``` r
+# Define function.
+exp_func <- function(rate = "all",poke = "all",level = "all"){
+
+  # Change inputs to lower case for variability in inputs.
+rate <- tolower(rate)
+poke <- tolower(poke)
+level <- tolower(level) 
+
+# Create empty object to be used later as the col names for the tibble.
+level_vec <- as.character()
+
+# If all rate are requested, rate is 1 through 6, if not rate is what was inputted.
+if("all" %in% rate){
+  rate <- c(1:6)
+}else{
+  rate <- rate
+} # End if else statement
+
+# Begin level for loop
+# Create vector for future column names.
+# Paste together "Level_" with the level number.
+for(a in 1:100){
+  level_vec[a] <- paste0("Level_",a)
+} # End level for loop
+
+# Begin rate loop.
+# Returns all below data for requested rates.
+for(i in 1:length(rate)){
+
+  # Get the data about the specific rate from API.
+raw_data <- fromJSON(paste0("https://pokeapi.co/api/v2/growth-rate/",rate[i]))
+
+  # Save description of rate 
+Description <- raw_data[["descriptions"]][["description"]][3]
+
+  # Save experience required to reach ever level.
+all_exp <- raw_data[["levels"]][["experience"]]
+
+# Begin pokemon loop.
+# Gets every Pokemon in the group.
+for(b in 1:length(raw_data[["pokemon_species"]][["name"]])){
+  
+  # Save name of Pokemon.
+  Name <- raw_data[["pokemon_species"]][["name"]][b]
+  
+  # Create tibble with name, description, required experience, and the future column names.
+  row_info <- tibble(Name,Description,all_exp,level_vec)
+ 
+  # if first iteration of pokemon loop, the df tibble is the row_info tibble.
+  # if not first iteration of pokemon loop, the df tibble is binded with the the new row_info to add more data.
+  if(b == 1){
+    df <- row_info
+  }else{
+    df <- rbind(df,row_info)
+  } # End if else statement.
+} # End Pokemon loop
+
+# The tibble at the end of the Pokemon loop is in long form.
+# This changes it to wide form (one row per Pokemon) and saves as the df2 tibble.
+df2 <- pivot_wider(df, id_cols = c(Name,Description), values_from = all_exp, names_from = level_vec)
+
+# If first iteration of rate loop, the final tibble is the df2 tibble.
+# If not first iteration, final tibble is binded with the newest df2 tibble.
+if(i == 1){
+  final <- df2
+}else{
+    final <- rbind(final,df2)
+  } # End if else statement.
+} # End of rate loop.
+
+
+# If all Pokemon are requested to return, no change to the final tibble.
+# If certain Pokemon are requested, the final tibble is filtered for them.
+if("all" %in% poke){
+  final <- final
+}else{
+  final <- final %>%
+          filter(Name %in% poke)
+} # End if else statement.
+
+# If all levels are requested to return, no change to final tibble.
+# If certain levels are requested we build the names of the columns to return,
+# and select only those columns to return.
+if("all" %in% level){
+  final <- final
+}else{
+  lvl_vec <- as.character()
+  
+  for(c in 1:length(level)){
+    lvl_vec[c] <- paste0("Level_",level[c])
+  } 
+  
+  final <- final %>%
+    select(Name,Description,lvl_vec)
+}# End if else statement.
+
+# Capitalize Names of Pokemon to match rest of functions.
+final$Name <- str_to_sentence(final$Name)
+
+# Return the final tibble.
+return(final)
+
+} # End of function
+```
+
+Here is the relationship between experience rate formula names and id
+numbers.
+
+| id\_num | exp\_name           |
+|--------:|:--------------------|
+|       1 | slow                |
+|       2 | medium              |
+|       3 | fast                |
+|       4 | medium-slow         |
+|       5 | slow-then-very-fast |
+|       6 | fast-then-very-slow |
+
 # Basic Functionality
 
-Below we show as basic example of each function.
+Below we show a basic example of each function.
 
 ## Encounter Example
 
@@ -653,13 +803,12 @@ print(dex_example)
 ```
 
     ## # A tibble: 4 x 6
-    ##   Name      National_Dex_Number Kanto_Dex_Number `Original-johto_Dex~ Hoenn_Dex_Number
-    ##   <chr>                   <int>            <int>                <int>            <int>
-    ## 1 Charizard                   6                6                  231               NA
-    ## 2 Beedrill                   15               15                   29               NA
-    ## 3 Pidgey                     16               16                   10               NA
-    ## 4 Abra                       63               63                   89               39
-    ## # ... with 1 more variable: Original-sinnoh_Dex_Number <int>
+    ##   Name      National_Dex_Number Kanto_Dex_Number `Original-johto_Dex_Number` Hoenn_Dex_Number `Original-sinnoh_Dex_Number`
+    ##   <chr>                   <int>            <int>                       <int>            <int>                        <int>
+    ## 1 Charizard                   6                6                         231               NA                           NA
+    ## 2 Beedrill                   15               15                          29               NA                           NA
+    ## 3 Pidgey                     16               16                          10               NA                           NA
+    ## 4 Abra                       63               63                          89               39                           20
 
 ## Egg Group Example
 
@@ -683,3 +832,25 @@ print(egg_example)
     ## 2 Beedrill  bug         <NA>       
     ## 3 Pidgey    flying      <NA>       
     ## 4 Abra      humanshape  <NA>
+
+## Experience Function Example
+
+Here we test the `exp_func` function. We are using all rate groups, the
+same `mons` vector we have been using, and levels 10, 25, 50, 75, and
+100.
+
+``` r
+# Use function on mons vector and for the specific levels we want.
+exp_example <- exp_func(rate = "all", poke = mons, level = c(10,25,50,75,100))
+
+# Return the tibble.
+print(exp_example)
+```
+
+    ## # A tibble: 4 x 7
+    ##   Name      Description Level_10 Level_25 Level_50 Level_75 Level_100
+    ##   <chr>     <chr>          <int>    <int>    <int>    <int>     <int>
+    ## 1 Beedrill  medium          1000    15625   125000   421875   1000000
+    ## 2 Pidgey    medium slow      560    11735   117360   429235   1059860
+    ## 3 Abra      medium slow      560    11735   117360   429235   1059860
+    ## 4 Charizard medium slow      560    11735   117360   429235   1059860

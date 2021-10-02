@@ -32,17 +32,18 @@ body {
 <h2 id="packages-needed">Packages Needed</h2>
 <p>In this Vignette we will need the following packages:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># You only need to run the install.packages() functions if you have not already downloaded the packages. </span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># As I already have them downloaded, I am not doing that here. If you need to, copy and paste the line needed, without the #, into your console and run.</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages(&quot;tidyverse&quot;)</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages(&quot;httr&quot;)</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages(&quot;jsonlite&quot;)</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages(&quot;knitr&quot;)</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(httr)</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(jsonlite)</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span></code></pre></div>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># As I already have them downloaded, I am not doing that here. </span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># If you need to, copy and paste the line needed, without the #, into your console and run.</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages(&quot;tidyverse&quot;)</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages(&quot;httr&quot;)</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages(&quot;jsonlite&quot;)</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages(&quot;knitr&quot;)</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(httr)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(jsonlite)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span></code></pre></div>
 <h1 id="building-the-functions">Building the Functions</h1>
 <h2 id="encounter-function">Encounter Function</h2>
 <p>Pokemon fans around the world, myself included, know the catch phrase from the TV show by heart. <strong>“Gotta Catch ’em All”</strong>. That speaks to a major part of both the Pokemon TV shows and the video games, which is collecting all the different Pokemon from around the fictional world and filling up your PokeDex with their information.</p>
@@ -616,15 +617,160 @@ body {
 </tr>
 </tbody>
 </table>
+<h2 id="experience-function">Experience Function</h2>
+<p>When Pokemon battle they gain experience. This experience can make the Pokemon grow to a new level, when Pokemon reach a new level they upgrade their base stats that we looked at earlier and they can even evolve into new Pokemon.</p>
+<p>Every Pokemon has a certain formula that defines how much experience it takes to get to the next level. These formulas can be read about <a href="https://bulbapedia.bulbagarden.net/wiki/Experience">here</a>. If you were interested in a question along the lines of “How much experience does it take for my Pokemon to reach level 50?” you can use the <code>exp_func</code>!</p>
+<p><code>exp_func</code> is deigned to return a tibble with the Pokemons name, the name of the level formula used, and the experience needed to reach levels 1 through 100 (the maximum for every Pokemon). The function takes three arguments <code>rate</code>, <code>poke</code>, and <code>level</code>, all arguments are optional as they default to “all”. They also all can take a single input or a vector of them.</p>
+<p><code>rate</code> is for the specific experience formulas you want to return data on, if you were wondering what Pokemon were in a certain formula group. You can define this as the name of the rate or the id number, the relationship between these will be shown after.</p>
+<p><code>poke</code> is for if you only want to return the data on specific Pokemon.</p>
+<p><code>level</code> is for what levels you would like to return data on, if not all. So if you wanted levels 10, 20, 30….level = c(10,20,30), would return the data for those levels.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define function.</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>exp_func <span class="ot">&lt;-</span> <span class="cf">function</span>(<span class="at">rate =</span> <span class="st">&quot;all&quot;</span>,<span class="at">poke =</span> <span class="st">&quot;all&quot;</span>,<span class="at">level =</span> <span class="st">&quot;all&quot;</span>){</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Change inputs to lower case for variability in inputs.</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>rate <span class="ot">&lt;-</span> <span class="fu">tolower</span>(rate)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>poke <span class="ot">&lt;-</span> <span class="fu">tolower</span>(poke)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>level <span class="ot">&lt;-</span> <span class="fu">tolower</span>(level) </span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Create empty object to be used later as the col names for the tibble.</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>level_vec <span class="ot">&lt;-</span> <span class="fu">as.character</span>()</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="co"># If all rate are requested, rate is 1 through 6, if not rate is what was inputted.</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span>(<span class="st">&quot;all&quot;</span> <span class="sc">%in%</span> rate){</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>  rate <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>)</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>}<span class="cf">else</span>{</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>  rate <span class="ot">&lt;-</span> rate</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>} <span class="co"># End if else statement</span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Begin level for loop</span></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Create vector for future column names.</span></span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Paste together &quot;Level_&quot; with the level number.</span></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(a <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">100</span>){</span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>  level_vec[a] <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;Level_&quot;</span>,a)</span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>} <span class="co"># End level for loop</span></span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a><span class="co"># Begin rate loop.</span></span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a><span class="co"># Returns all below data for requested rates.</span></span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(rate)){</span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Get the data about the specific rate from API.</span></span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a>raw_data <span class="ot">&lt;-</span> <span class="fu">fromJSON</span>(<span class="fu">paste0</span>(<span class="st">&quot;https://pokeapi.co/api/v2/growth-rate/&quot;</span>,rate[i]))</span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Save description of rate </span></span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>Description <span class="ot">&lt;-</span> raw_data[[<span class="st">&quot;descriptions&quot;</span>]][[<span class="st">&quot;description&quot;</span>]][<span class="dv">3</span>]</span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Save experience required to reach ever level.</span></span>
+<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a>all_exp <span class="ot">&lt;-</span> raw_data[[<span class="st">&quot;levels&quot;</span>]][[<span class="st">&quot;experience&quot;</span>]]</span>
+<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a><span class="co"># Begin pokemon loop.</span></span>
+<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a><span class="co"># Gets every Pokemon in the group.</span></span>
+<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(b <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(raw_data[[<span class="st">&quot;pokemon_species&quot;</span>]][[<span class="st">&quot;name&quot;</span>]])){</span>
+<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb7-43"><a href="#cb7-43" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Save name of Pokemon.</span></span>
+<span id="cb7-44"><a href="#cb7-44" aria-hidden="true" tabindex="-1"></a>  Name <span class="ot">&lt;-</span> raw_data[[<span class="st">&quot;pokemon_species&quot;</span>]][[<span class="st">&quot;name&quot;</span>]][b]</span>
+<span id="cb7-45"><a href="#cb7-45" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb7-46"><a href="#cb7-46" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Create tibble with name, description, required experience, and the future column names.</span></span>
+<span id="cb7-47"><a href="#cb7-47" aria-hidden="true" tabindex="-1"></a>  row_info <span class="ot">&lt;-</span> <span class="fu">tibble</span>(Name,Description,all_exp,level_vec)</span>
+<span id="cb7-48"><a href="#cb7-48" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb7-49"><a href="#cb7-49" aria-hidden="true" tabindex="-1"></a>  <span class="co"># if first iteration of pokemon loop, the df tibble is the row_info tibble.</span></span>
+<span id="cb7-50"><a href="#cb7-50" aria-hidden="true" tabindex="-1"></a>  <span class="co"># if not first iteration of pokemon loop, the df tibble is binded with the the new row_info to add more data.</span></span>
+<span id="cb7-51"><a href="#cb7-51" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(b <span class="sc">==</span> <span class="dv">1</span>){</span>
+<span id="cb7-52"><a href="#cb7-52" aria-hidden="true" tabindex="-1"></a>    df <span class="ot">&lt;-</span> row_info</span>
+<span id="cb7-53"><a href="#cb7-53" aria-hidden="true" tabindex="-1"></a>  }<span class="cf">else</span>{</span>
+<span id="cb7-54"><a href="#cb7-54" aria-hidden="true" tabindex="-1"></a>    df <span class="ot">&lt;-</span> <span class="fu">rbind</span>(df,row_info)</span>
+<span id="cb7-55"><a href="#cb7-55" aria-hidden="true" tabindex="-1"></a>  } <span class="co"># End if else statement.</span></span>
+<span id="cb7-56"><a href="#cb7-56" aria-hidden="true" tabindex="-1"></a>} <span class="co"># End Pokemon loop</span></span>
+<span id="cb7-57"><a href="#cb7-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-58"><a href="#cb7-58" aria-hidden="true" tabindex="-1"></a><span class="co"># The tibble at the end of the Pokemon loop is in long form.</span></span>
+<span id="cb7-59"><a href="#cb7-59" aria-hidden="true" tabindex="-1"></a><span class="co"># This changes it to wide form (one row per Pokemon) and saves as the df2 tibble.</span></span>
+<span id="cb7-60"><a href="#cb7-60" aria-hidden="true" tabindex="-1"></a>df2 <span class="ot">&lt;-</span> <span class="fu">pivot_wider</span>(df, <span class="at">id_cols =</span> <span class="fu">c</span>(Name,Description), <span class="at">values_from =</span> all_exp, <span class="at">names_from =</span> level_vec)</span>
+<span id="cb7-61"><a href="#cb7-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-62"><a href="#cb7-62" aria-hidden="true" tabindex="-1"></a><span class="co"># If first iteration of rate loop, the final tibble is the df2 tibble.</span></span>
+<span id="cb7-63"><a href="#cb7-63" aria-hidden="true" tabindex="-1"></a><span class="co"># If not first iteration, final tibble is binded with the newest df2 tibble.</span></span>
+<span id="cb7-64"><a href="#cb7-64" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span>(i <span class="sc">==</span> <span class="dv">1</span>){</span>
+<span id="cb7-65"><a href="#cb7-65" aria-hidden="true" tabindex="-1"></a>  final <span class="ot">&lt;-</span> df2</span>
+<span id="cb7-66"><a href="#cb7-66" aria-hidden="true" tabindex="-1"></a>}<span class="cf">else</span>{</span>
+<span id="cb7-67"><a href="#cb7-67" aria-hidden="true" tabindex="-1"></a>    final <span class="ot">&lt;-</span> <span class="fu">rbind</span>(final,df2)</span>
+<span id="cb7-68"><a href="#cb7-68" aria-hidden="true" tabindex="-1"></a>  } <span class="co"># End if else statement.</span></span>
+<span id="cb7-69"><a href="#cb7-69" aria-hidden="true" tabindex="-1"></a>} <span class="co"># End of rate loop.</span></span>
+<span id="cb7-70"><a href="#cb7-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-71"><a href="#cb7-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-72"><a href="#cb7-72" aria-hidden="true" tabindex="-1"></a><span class="co"># If all Pokemon are requested to return, no change to the final tibble.</span></span>
+<span id="cb7-73"><a href="#cb7-73" aria-hidden="true" tabindex="-1"></a><span class="co"># If certain Pokemon are requested, the final tibble is filtered for them.</span></span>
+<span id="cb7-74"><a href="#cb7-74" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span>(<span class="st">&quot;all&quot;</span> <span class="sc">%in%</span> poke){</span>
+<span id="cb7-75"><a href="#cb7-75" aria-hidden="true" tabindex="-1"></a>  final <span class="ot">&lt;-</span> final</span>
+<span id="cb7-76"><a href="#cb7-76" aria-hidden="true" tabindex="-1"></a>}<span class="cf">else</span>{</span>
+<span id="cb7-77"><a href="#cb7-77" aria-hidden="true" tabindex="-1"></a>  final <span class="ot">&lt;-</span> final <span class="sc">%&gt;%</span></span>
+<span id="cb7-78"><a href="#cb7-78" aria-hidden="true" tabindex="-1"></a>          <span class="fu">filter</span>(Name <span class="sc">%in%</span> poke)</span>
+<span id="cb7-79"><a href="#cb7-79" aria-hidden="true" tabindex="-1"></a>} <span class="co"># End if else statement.</span></span>
+<span id="cb7-80"><a href="#cb7-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-81"><a href="#cb7-81" aria-hidden="true" tabindex="-1"></a><span class="co"># If all levels are requested to return, no change to final tibble.</span></span>
+<span id="cb7-82"><a href="#cb7-82" aria-hidden="true" tabindex="-1"></a><span class="co"># If certain levels are requested we build the names of the columns to return,</span></span>
+<span id="cb7-83"><a href="#cb7-83" aria-hidden="true" tabindex="-1"></a><span class="co"># and select only those columns to return.</span></span>
+<span id="cb7-84"><a href="#cb7-84" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span>(<span class="st">&quot;all&quot;</span> <span class="sc">%in%</span> level){</span>
+<span id="cb7-85"><a href="#cb7-85" aria-hidden="true" tabindex="-1"></a>  final <span class="ot">&lt;-</span> final</span>
+<span id="cb7-86"><a href="#cb7-86" aria-hidden="true" tabindex="-1"></a>}<span class="cf">else</span>{</span>
+<span id="cb7-87"><a href="#cb7-87" aria-hidden="true" tabindex="-1"></a>  lvl_vec <span class="ot">&lt;-</span> <span class="fu">as.character</span>()</span>
+<span id="cb7-88"><a href="#cb7-88" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb7-89"><a href="#cb7-89" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(c <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(level)){</span>
+<span id="cb7-90"><a href="#cb7-90" aria-hidden="true" tabindex="-1"></a>    lvl_vec[c] <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;Level_&quot;</span>,level[c])</span>
+<span id="cb7-91"><a href="#cb7-91" aria-hidden="true" tabindex="-1"></a>  } </span>
+<span id="cb7-92"><a href="#cb7-92" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb7-93"><a href="#cb7-93" aria-hidden="true" tabindex="-1"></a>  final <span class="ot">&lt;-</span> final <span class="sc">%&gt;%</span></span>
+<span id="cb7-94"><a href="#cb7-94" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(Name,Description,lvl_vec)</span>
+<span id="cb7-95"><a href="#cb7-95" aria-hidden="true" tabindex="-1"></a>}<span class="co"># End if else statement.</span></span>
+<span id="cb7-96"><a href="#cb7-96" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-97"><a href="#cb7-97" aria-hidden="true" tabindex="-1"></a><span class="co"># Capitalize Names of Pokemon to match rest of functions.</span></span>
+<span id="cb7-98"><a href="#cb7-98" aria-hidden="true" tabindex="-1"></a>final<span class="sc">$</span>Name <span class="ot">&lt;-</span> <span class="fu">str_to_sentence</span>(final<span class="sc">$</span>Name)</span>
+<span id="cb7-99"><a href="#cb7-99" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-100"><a href="#cb7-100" aria-hidden="true" tabindex="-1"></a><span class="co"># Return the final tibble.</span></span>
+<span id="cb7-101"><a href="#cb7-101" aria-hidden="true" tabindex="-1"></a><span class="fu">return</span>(final)</span>
+<span id="cb7-102"><a href="#cb7-102" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-103"><a href="#cb7-103" aria-hidden="true" tabindex="-1"></a>} <span class="co"># End of function</span></span></code></pre></div>
+<p>Here is the relationship between experience rate formula names and id numbers.</p>
+<table>
+<thead>
+<tr class="header">
+<th align="right">id_num</th>
+<th align="left">exp_name</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">1</td>
+<td align="left">slow</td>
+</tr>
+<tr class="even">
+<td align="right">2</td>
+<td align="left">medium</td>
+</tr>
+<tr class="odd">
+<td align="right">3</td>
+<td align="left">fast</td>
+</tr>
+<tr class="even">
+<td align="right">4</td>
+<td align="left">medium-slow</td>
+</tr>
+<tr class="odd">
+<td align="right">5</td>
+<td align="left">slow-then-very-fast</td>
+</tr>
+<tr class="even">
+<td align="right">6</td>
+<td align="left">fast-then-very-slow</td>
+</tr>
+</tbody>
+</table>
 <h1 id="basic-functionality">Basic Functionality</h1>
-<p>Below we show as basic example of each function.</p>
+<p>Below we show a basic example of each function.</p>
 <h2 id="encounter-example">Encounter Example</h2>
 <p>Here we test the encounter function with my favorite starter Pokemon <strong>CHARMANDER</strong>.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use the function and save results in an object</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>charmander <span class="ot">&lt;-</span> <span class="fu">encounter</span>(<span class="st">&quot;charmander&quot;</span>)</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Print the object</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(charmander)</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use the function and save results in an object</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>charmander <span class="ot">&lt;-</span> <span class="fu">encounter</span>(<span class="st">&quot;charmander&quot;</span>)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Print the object</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(charmander)</span></code></pre></div>
 <pre><code>## # A tibble: 9 x 6
 ##   Location            Game       Chance Max_Level Min_Level Method
 ##   &lt;chr&gt;               &lt;chr&gt;       &lt;int&gt;     &lt;int&gt;     &lt;int&gt; &lt;chr&gt; 
@@ -639,14 +785,14 @@ body {
 ## 9 lumiose-city-area   y             100        10        10 gift</code></pre>
 <h2 id="stats-example">Stats Example</h2>
 <p>Here is an example of the <code>stats</code> function, with a vector of four Pokemon.</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a vector of four Pokemon</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>mons <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;charizard&quot;</span>,<span class="st">&quot;pidgey&quot;</span>,<span class="st">&quot;abra&quot;</span>,<span class="st">&quot;beedrill&quot;</span>) </span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Use the function on the vector</span></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>stat_example <span class="ot">&lt;-</span> <span class="fu">stats</span>(mons)</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Print results</span></span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(stat_example)</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a vector of four Pokemon</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>mons <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;charizard&quot;</span>,<span class="st">&quot;pidgey&quot;</span>,<span class="st">&quot;abra&quot;</span>,<span class="st">&quot;beedrill&quot;</span>) </span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Use the function on the vector</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>stat_example <span class="ot">&lt;-</span> <span class="fu">stats</span>(mons)</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Print results</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(stat_example)</span></code></pre></div>
 <pre><code>## # A tibble: 4 x 7
 ##   name         hp attack defense `special-attack` `special-defense` speed
 ##   &lt;chr&gt;     &lt;int&gt;  &lt;int&gt;   &lt;int&gt;            &lt;int&gt;             &lt;int&gt; &lt;int&gt;
@@ -656,11 +802,11 @@ body {
 ## 4 Beedrill     65     90      40               45                80    75</code></pre>
 <h2 id="size-example">Size Example</h2>
 <p>Here we test the <code>size</code> function, with the same vector of four Pokemon from the <code>stats</code> example.</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use the function on the vector</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>size_example <span class="ot">&lt;-</span> <span class="fu">size</span>(mons)</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Print results</span></span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(size_example)</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use the function on the vector</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>size_example <span class="ot">&lt;-</span> <span class="fu">size</span>(mons)</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Print results</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(size_example)</span></code></pre></div>
 <pre><code>## # A tibble: 4 x 3
 ##   Name      Height_Meters Weight_Kilograms
 ##   &lt;chr&gt;             &lt;dbl&gt;            &lt;dbl&gt;
@@ -670,26 +816,25 @@ body {
 ## 4 Beedrill            1               29.5</code></pre>
 <h2 id="dex-example">Dex Example</h2>
 <p>Here we test the <code>dex</code> function. We are using regions with dex ids 1 through 5, and only returning results on our same four Pokemon from the previous two examples. Any <code>NA</code> means that the Pokemon is not in that Pokedex.</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use function on vectors</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>dex_example <span class="ot">&lt;-</span> <span class="fu">dex</span>(<span class="at">reg =</span> <span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>), <span class="at">poke =</span> mons)</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Print results</span></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(dex_example)</span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use function on vectors</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>dex_example <span class="ot">&lt;-</span> <span class="fu">dex</span>(<span class="at">reg =</span> <span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>), <span class="at">poke =</span> mons)</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Print results</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(dex_example)</span></code></pre></div>
 <pre><code>## # A tibble: 4 x 6
-##   Name      National_Dex_Number Kanto_Dex_Number `Original-johto_Dex~ Hoenn_Dex_Number
-##   &lt;chr&gt;                   &lt;int&gt;            &lt;int&gt;                &lt;int&gt;            &lt;int&gt;
-## 1 Charizard                   6                6                  231               NA
-## 2 Beedrill                   15               15                   29               NA
-## 3 Pidgey                     16               16                   10               NA
-## 4 Abra                       63               63                   89               39
-## # ... with 1 more variable: Original-sinnoh_Dex_Number &lt;int&gt;</code></pre>
+##   Name      National_Dex_Number Kanto_Dex_Number `Original-johto_Dex_Number` Hoenn_Dex_Number `Original-sinnoh_Dex_Number`
+##   &lt;chr&gt;                   &lt;int&gt;            &lt;int&gt;                       &lt;int&gt;            &lt;int&gt;                        &lt;int&gt;
+## 1 Charizard                   6                6                         231               NA                           NA
+## 2 Beedrill                   15               15                          29               NA                           NA
+## 3 Pidgey                     16               16                          10               NA                           NA
+## 4 Abra                       63               63                          89               39                           20</code></pre>
 <h2 id="egg-group-example">Egg Group Example</h2>
 <p>Here we test the <code>egg_group</code> function. We are using all egg groups, and returning the information for the Pokemon in our <code>mons</code> vector that we have been using. Any <code>NA</code> means the Pokemon doesn’t have a second egg group.</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use function on mons vector.</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>egg_example <span class="ot">&lt;-</span> <span class="fu">egg_group</span>(<span class="at">group =</span> <span class="st">&quot;all&quot;</span>, <span class="at">poke =</span> mons)</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Return the tibble.</span></span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(egg_example)</span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use function on mons vector.</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>egg_example <span class="ot">&lt;-</span> <span class="fu">egg_group</span>(<span class="at">group =</span> <span class="st">&quot;all&quot;</span>, <span class="at">poke =</span> mons)</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Return the tibble.</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(egg_example)</span></code></pre></div>
 <pre><code>## # A tibble: 4 x 3
 ##   Name      Egg_Group_1 Egg_Group_2
 ##   &lt;chr&gt;     &lt;chr&gt;       &lt;chr&gt;      
@@ -697,6 +842,20 @@ body {
 ## 2 Beedrill  bug         &lt;NA&gt;       
 ## 3 Pidgey    flying      &lt;NA&gt;       
 ## 4 Abra      humanshape  &lt;NA&gt;</code></pre>
+<h2 id="experience-function-example">Experience Function Example</h2>
+<p>Here we test the <code>exp_func</code> function. We are using all rate groups, the same <code>mons</code> vector we have been using, and levels 10, 25, 50, 75, and 100.</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use function on mons vector and for the specific levels we want.</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>exp_example <span class="ot">&lt;-</span> <span class="fu">exp_func</span>(<span class="at">rate =</span> <span class="st">&quot;all&quot;</span>, <span class="at">poke =</span> mons, <span class="at">level =</span> <span class="fu">c</span>(<span class="dv">10</span>,<span class="dv">25</span>,<span class="dv">50</span>,<span class="dv">75</span>,<span class="dv">100</span>))</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Return the tibble.</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(exp_example)</span></code></pre></div>
+<pre><code>## # A tibble: 4 x 7
+##   Name      Description Level_10 Level_25 Level_50 Level_75 Level_100
+##   &lt;chr&gt;     &lt;chr&gt;          &lt;int&gt;    &lt;int&gt;    &lt;int&gt;    &lt;int&gt;     &lt;int&gt;
+## 1 Beedrill  medium          1000    15625   125000   421875   1000000
+## 2 Pidgey    medium slow      560    11735   117360   429235   1059860
+## 3 Abra      medium slow      560    11735   117360   429235   1059860
+## 4 Charizard medium slow      560    11735   117360   429235   1059860</code></pre>
 
 </body>
 </html>
