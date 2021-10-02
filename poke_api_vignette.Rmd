@@ -9,7 +9,7 @@ knitr::opts_chunk$set(eval = TRUE, echo = TRUE, message = FALSE, warning = FALSE
 ```
 
 
-## Introduction
+# Introduction
 
 This space reserved for introduction, talk about the project, my thoughts, and then an overview of my work.
 
@@ -45,95 +45,117 @@ That speaks to a major part of both the Pokemon TV shows and the video games, wh
 However, before you can catch 'em, you gotta find 'em. That is the purpose of this function is to find what locations in games you can find Pokemon in the wild. It will also return the chance of encountering the Pokemon there, the minimum level, the maximum level, and how you would encounter the Pokemon (walking in tall grass vs being given as a gift as an example.)
 
 
-The function `encounter` is built below and an example will be shown later. `encounter` takes two arguments, the first one is not optional, and that is the Pokemon you want to find. The second argument is optional, and that is what game from the series you want to return data on, if no game is selected then all games will be returned in the final tibble. **Both arguments require quoted strings**
+The function `encounter` is built below and an example will be shown later. `encounter` takes two arguments, the first one is `poke` and is not optional. That is for the Pokemon you want to find, it can be for a single character string or a vector of them.  The second argument, `game`, is optional, and that is what game from the series you want to return data on, if no game is selected then all games will be returned in the final tibble. 
 
+Of note, this function will error if you request the data for a Pokemon not able to be acquired. For instance Charizard can't just be found in a game you have to evolve a Charmander to a Charizard in order to have one.
 ```{r encounter_func}
 
-# Starting the function
+# Define function
 encounter <- function(poke, game = "all") {
-
-# Converting inputs to lower case for flexability
-poke <- tolower(poke)
-game <- tolower(game)
-
-# Get the requested data   
-raw_data <- fromJSON(paste0("https://pokeapi.co/api/v2/pokemon/",poke,"/encounters"), flatten = TRUE)
-
-
-# Start loops.
-# Beginning of location loop.
-for (i in 1:dim(raw_data)[1]) {
   
-  # Get the location from raw.
-  loc <- raw_data[i,2]
+  # Converting inputs to lower case for flexibility
+  poke <- tolower(poke)
+  game <- tolower(game)
   
-  # Beginning of game loop.
-  for (b in 1:dim(raw_data[[1]][[i]])[1]){
+  # Start all loops.
+  # Start loop for specific pokemon.
+  for(c in 1:length(poke)){
+  
+  # Get the requested data   
+  raw_data <- fromJSON(paste0("https://pokeapi.co/api/v2/pokemon/",poke[c],"/encounters"), flatten = TRUE)
+  
+  
+  # Beginning of location loop.
+  for (i in 1:dim(raw_data)[1]) {
     
-    # Get the specific game from raw.
-    gm <- raw_data[[1]][[i]][b,3]
+    # Get the location from raw.
+    loc <- raw_data[i,2]
     
-    # Beginning of details loop.
-    for (a in 1:dim(raw_data[[1]][[i]][[1]][[b]])[1]){
+    # Beginning of game loop.
+    for (b in 1:dim(raw_data[[1]][[i]])[1]){
       
-      # Get the chance, max level, min level, and method.
-      chance <- raw_data[[1]][[i]][[1]][[b]][a,1]
-      max    <- raw_data[[1]][[i]][[1]][[b]][a,3]
-      min    <- raw_data[[1]][[i]][[1]][[b]][a,4]
-      meth   <- raw_data[[1]][[i]][[1]][[b]][a,5]
+      # Get the specific game from raw.
+      gm <- raw_data[[1]][[i]][b,3]
       
-      # Combine all vars into a line for tibble creation
-      line   <- c(loc,gm,chance,max,min,meth)
-         
-      # Build dfd tibble.
-      # If this is the first iteration of the details loop
-      # then dfd is created with all of the vars.
-      # If not first iteration, bind dfd with line to add another line to dfd.
-      if(a == 1){
-        dfd <- tibble(loc,gm,chance,max,min,meth)
-      } else{
+      # Beginning of details loop.
+      for (a in 1:dim(raw_data[[1]][[i]][[1]][[b]])[1]){
+        
+        # Get the name, chance, max level, min level, and method.
+        Name   <- poke[c]
+        chance <- raw_data[[1]][[i]][[1]][[b]][a,1]
+        max    <- raw_data[[1]][[i]][[1]][[b]][a,3]
+        min    <- raw_data[[1]][[i]][[1]][[b]][a,4]
+        meth   <- raw_data[[1]][[i]][[1]][[b]][a,5]
+        
+        # Combine all vars into a line for tibble creation
+        line   <- c(Name,loc,gm,chance,max,min,meth)
+        
+        # Build dfd tibble.
+        # If this is the first iteration of the details loop
+        # then dfd is created with all of the vars.
+        # If not first iteration, bind dfd with line to add another line to dfd.
+        if(a == 1){
+          dfd <- tibble(Name,loc,gm,chance,max,min,meth)
+        } else{
           dfd <- rbind(dfd,line)
         } # Close if else statement.
       } # Close details loop.
-  
-    # Build dfg tibble.
-    # If first iteration of game loop, dfg is dfd.
-    # If not first iteration, dfg is binded with dfd to add more lines.
-    if(b == 1)
-    {dfg <- dfd
-    }else{
-      dfg <- rbind(dfg,dfd)
-    } # Close if else statement
+      
+      # Build dfg tibble.
+      # If first iteration of game loop, dfg is dfd.
+      # If not first iteration, dfg is binded with dfd to add more lines.
+      if(b == 1)
+      {dfg <- dfd
+      }else{
+        dfg <- rbind(dfg,dfd)
+      } # Close if else statement
     } # Close game loop
     
-  # Create final tibble
-  # If first iteration of location loop, dfl is the final dfg from the game loop.
-  # If not first iteration, dfl is binded with the most recent dfg to add more lines.
-  if(i==1){
-    dfl <- dfg
-  }else{
-    dfl <- rbind(dfl,dfg)
-  } # End if else statement
+    # Create final tibble
+    # If first iteration of location loop, dfl is the final dfg from the game loop.
+    # If not first iteration, dfl is binded with the most recent dfg to add more lines.
+    if(i==1){
+      dfl <- dfg
+    }else{
+      dfl <- rbind(dfl,dfg)
+    } # End if else statement
   } # End location loop
-# End of all loops
+  # End of all loops
+  
+  # Rename variables in final dfl.
+  names(dfl) <- c("Name","Location","Game","Chance","Max_Level","Min_Level","Method")
+  
+  # Keep only distinct rows, as there are some that repeat due to variables 
+  # not important for this function.
+  dfl <- distinct(dfl)
+  
 
-# Rename variables in final dfl.
-names(dfl) <- c("Location","Game","Chance","Max_Level","Min_Level","Method")
+  # If first iteration of main loop, final tibble is dfl tibble.
+  # If not first iteration, final tibble is binded with df1 tibble
+  if(c == 1){
+    final <- dfl
+  }else{
+    final <- rbind(final,dfl)
+  } # End if else statement
+  
+  } # End main loop
+  
+  # If user wants all games returned, no change to final tibble.
+  # If user wants specific games, final is filtered for these games.
+  if("all" %in% game){
+    final <- final
+  }else{
+    final <- final %>%
+      filter(Game %in% game)
+  } # End if else statement.
+  
+  # Capitalize name of the Pokemon.
+  final$Name <- str_to_sentence(final$Name)
+  
+  # Return final tibble.
+  return(final)
+  } # End function.
 
-# Keep only distinct rows, as there are some that repeat due to variables 
-# not important for this function.
-dfl <- distinct(dfl)
-
-# If user doesn't input an option for game or wants all games, dfl is returned.
-# If user does input an option for game, then dfl is filtered for that game and returned.
-if(game == "all"){
-   return(dfl)
-}else{
-    return(dfl %>%
-             filter(Game == game))
-  } # End of if else statement.
-
-} # Close of function.
 ```
 
 
@@ -717,23 +739,24 @@ Below we show a basic example of each function.
 
 ## Encounter Example
 
-Here we test the encounter function with my favorite starter Pokemon **CHARMANDER**.
+Here we test the encounter function with a vector we create called mons that we will use throughout the examples. Also, we are only requesting information of the red and fire red versions of the games.
 
 ```{r encounter example}
+# Create a vector of four Pokemon
+mons <- c("charmander","pidgey","abra","beedrill") 
+
 # Use the function and save results in an object
-charmander <- encounter("charmander")
+enc_example <- encounter(poke = mons, game = c("red","firered"))
 
 # Print the object
-print(charmander)
+print(enc_example)
 ```
 
 ## Stats Example
 
-Here is an example of the `stats` function, with a vector of four Pokemon.
+Here is an example of the `stats` function, with the mons vector.
 
 ```{r stats example}
-# Create a vector of four Pokemon
-mons <- c("charizard","pidgey","abra","beedrill") 
 
 # Use the function on the vector
 stat_example <- stats(mons)
@@ -745,7 +768,7 @@ print(stat_example)
 
 ## Size Example
 
-Here we test the `size` function, with the same vector of four Pokemon from the `stats` example.
+Here we test the `size` function, with the same vector of four Pokemon.
 
 
 ```{r size example}
@@ -758,7 +781,7 @@ print(size_example)
 
 ## Dex Example
 
-Here we test the `dex` function. We are using regions with dex ids 1 through 5, and only returning results on our same four Pokemon from the previous two examples. Any `NA` means that the Pokemon is not in that Pokedex.
+Here we test the `dex` function. We are using regions with dex ids 1 through 5, and only returning results on our same four Pokemon. Any `NA` means that the Pokemon is not in that Pokedex.
 
 ```{r dex example}
 # Use function on vectors

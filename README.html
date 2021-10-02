@@ -27,7 +27,7 @@ body {
 
 <h1 id="poke-api-vignette">Poke API Vignette</h1>
 <p>Evan Patton 9/27/2021</p>
-<h2 id="introduction">Introduction</h2>
+<h1 id="introduction">Introduction</h1>
 <p>This space reserved for introduction, talk about the project, my thoughts, and then an overview of my work.</p>
 <h2 id="packages-needed">Packages Needed</h2>
 <p>In this Vignette we will need the following packages:</p>
@@ -48,92 +48,113 @@ body {
 <h2 id="encounter-function">Encounter Function</h2>
 <p>Pokemon fans around the world, myself included, know the catch phrase from the TV show by heart. <strong>“Gotta Catch ’em All”</strong>. That speaks to a major part of both the Pokemon TV shows and the video games, which is collecting all the different Pokemon from around the fictional world and filling up your PokeDex with their information.</p>
 <p>However, before you can catch ’em, you gotta find ’em. That is the purpose of this function is to find what locations in games you can find Pokemon in the wild. It will also return the chance of encountering the Pokemon there, the minimum level, the maximum level, and how you would encounter the Pokemon (walking in tall grass vs being given as a gift as an example.)</p>
-<p>The function <code>encounter</code> is built below and an example will be shown later. <code>encounter</code> takes two arguments, the first one is not optional, and that is the Pokemon you want to find. The second argument is optional, and that is what game from the series you want to return data on, if no game is selected then all games will be returned in the final tibble. <strong>Both arguments require quoted strings</strong></p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Starting the function</span></span>
+<p>The function <code>encounter</code> is built below and an example will be shown later. <code>encounter</code> takes two arguments, the first one is <code>poke</code> and is not optional. That is for the Pokemon you want to find, it can be for a single character string or a vector of them. The second argument, <code>game</code>, is optional, and that is what game from the series you want to return data on, if no game is selected then all games will be returned in the final tibble.</p>
+<p>Of note, this function will error if you request the data for a Pokemon not able to be acquired. For instance Charizard can’t just be found in a game you have to evolve a Charmander to a Charizard in order to have one.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define function</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>encounter <span class="ot">&lt;-</span> <span class="cf">function</span>(poke, <span class="at">game =</span> <span class="st">&quot;all&quot;</span>) {</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Converting inputs to lower case for flexability</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>poke <span class="ot">&lt;-</span> <span class="fu">tolower</span>(poke)</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>game <span class="ot">&lt;-</span> <span class="fu">tolower</span>(game)</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Get the requested data   </span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>raw_data <span class="ot">&lt;-</span> <span class="fu">fromJSON</span>(<span class="fu">paste0</span>(<span class="st">&quot;https://pokeapi.co/api/v2/pokemon/&quot;</span>,poke,<span class="st">&quot;/encounters&quot;</span>), <span class="at">flatten =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Start loops.</span></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Beginning of location loop.</span></span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">dim</span>(raw_data)[<span class="dv">1</span>]) {</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Converting inputs to lower case for flexibility</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  poke <span class="ot">&lt;-</span> <span class="fu">tolower</span>(poke)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  game <span class="ot">&lt;-</span> <span class="fu">tolower</span>(game)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Start all loops.</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Start loop for specific pokemon.</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(c <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(poke)){</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Get the requested data   </span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>  raw_data <span class="ot">&lt;-</span> <span class="fu">fromJSON</span>(<span class="fu">paste0</span>(<span class="st">&quot;https://pokeapi.co/api/v2/pokemon/&quot;</span>,poke[c],<span class="st">&quot;/encounters&quot;</span>), <span class="at">flatten =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>  </span>
 <span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Get the location from raw.</span></span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>  loc <span class="ot">&lt;-</span> raw_data[i,<span class="dv">2</span>]</span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Beginning of game loop.</span></span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (b <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">dim</span>(raw_data[[<span class="dv">1</span>]][[i]])[<span class="dv">1</span>]){</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Beginning of location loop.</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">dim</span>(raw_data)[<span class="dv">1</span>]) {</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Get the location from raw.</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    loc <span class="ot">&lt;-</span> raw_data[i,<span class="dv">2</span>]</span>
 <span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Get the specific game from raw.</span></span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    gm <span class="ot">&lt;-</span> raw_data[[<span class="dv">1</span>]][[i]][b,<span class="dv">3</span>]</span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Beginning of details loop.</span></span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (a <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">dim</span>(raw_data[[<span class="dv">1</span>]][[i]][[<span class="dv">1</span>]][[b]])[<span class="dv">1</span>]){</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Beginning of game loop.</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (b <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">dim</span>(raw_data[[<span class="dv">1</span>]][[i]])[<span class="dv">1</span>]){</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Get the specific game from raw.</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>      gm <span class="ot">&lt;-</span> raw_data[[<span class="dv">1</span>]][[i]][b,<span class="dv">3</span>]</span>
 <span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>      </span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Get the chance, max level, min level, and method.</span></span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>      chance <span class="ot">&lt;-</span> raw_data[[<span class="dv">1</span>]][[i]][[<span class="dv">1</span>]][[b]][a,<span class="dv">1</span>]</span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>      max    <span class="ot">&lt;-</span> raw_data[[<span class="dv">1</span>]][[i]][[<span class="dv">1</span>]][[b]][a,<span class="dv">3</span>]</span>
-<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>      min    <span class="ot">&lt;-</span> raw_data[[<span class="dv">1</span>]][[i]][[<span class="dv">1</span>]][[b]][a,<span class="dv">4</span>]</span>
-<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>      meth   <span class="ot">&lt;-</span> raw_data[[<span class="dv">1</span>]][[i]][[<span class="dv">1</span>]][[b]][a,<span class="dv">5</span>]</span>
-<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>      </span>
-<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Combine all vars into a line for tibble creation</span></span>
-<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>      line   <span class="ot">&lt;-</span> <span class="fu">c</span>(loc,gm,chance,max,min,meth)</span>
-<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>         </span>
-<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Build dfd tibble.</span></span>
-<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>      <span class="co"># If this is the first iteration of the details loop</span></span>
-<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>      <span class="co"># then dfd is created with all of the vars.</span></span>
-<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>      <span class="co"># If not first iteration, bind dfd with line to add another line to dfd.</span></span>
-<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span>(a <span class="sc">==</span> <span class="dv">1</span>){</span>
-<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>        dfd <span class="ot">&lt;-</span> <span class="fu">tibble</span>(loc,gm,chance,max,min,meth)</span>
-<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>      } <span class="cf">else</span>{</span>
-<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>          dfd <span class="ot">&lt;-</span> <span class="fu">rbind</span>(dfd,line)</span>
-<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>        } <span class="co"># Close if else statement.</span></span>
-<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>      } <span class="co"># Close details loop.</span></span>
-<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Build dfg tibble.</span></span>
-<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a>    <span class="co"># If first iteration of game loop, dfg is dfd.</span></span>
-<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>    <span class="co"># If not first iteration, dfg is binded with dfd to add more lines.</span></span>
-<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span>(b <span class="sc">==</span> <span class="dv">1</span>)</span>
-<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a>    {dfg <span class="ot">&lt;-</span> dfd</span>
-<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a>    }<span class="cf">else</span>{</span>
-<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a>      dfg <span class="ot">&lt;-</span> <span class="fu">rbind</span>(dfg,dfd)</span>
-<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a>    } <span class="co"># Close if else statement</span></span>
-<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a>    } <span class="co"># Close game loop</span></span>
-<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Create final tibble</span></span>
-<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a>  <span class="co"># If first iteration of location loop, dfl is the final dfg from the game loop.</span></span>
-<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a>  <span class="co"># If not first iteration, dfl is binded with the most recent dfg to add more lines.</span></span>
-<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(i<span class="sc">==</span><span class="dv">1</span>){</span>
-<span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a>    dfl <span class="ot">&lt;-</span> dfg</span>
-<span id="cb2-63"><a href="#cb2-63" aria-hidden="true" tabindex="-1"></a>  }<span class="cf">else</span>{</span>
-<span id="cb2-64"><a href="#cb2-64" aria-hidden="true" tabindex="-1"></a>    dfl <span class="ot">&lt;-</span> <span class="fu">rbind</span>(dfl,dfg)</span>
-<span id="cb2-65"><a href="#cb2-65" aria-hidden="true" tabindex="-1"></a>  } <span class="co"># End if else statement</span></span>
-<span id="cb2-66"><a href="#cb2-66" aria-hidden="true" tabindex="-1"></a>  } <span class="co"># End location loop</span></span>
-<span id="cb2-67"><a href="#cb2-67" aria-hidden="true" tabindex="-1"></a><span class="co"># End of all loops</span></span>
-<span id="cb2-68"><a href="#cb2-68" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-69"><a href="#cb2-69" aria-hidden="true" tabindex="-1"></a><span class="co"># Rename variables in final dfl.</span></span>
-<span id="cb2-70"><a href="#cb2-70" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(dfl) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Location&quot;</span>,<span class="st">&quot;Game&quot;</span>,<span class="st">&quot;Chance&quot;</span>,<span class="st">&quot;Max_Level&quot;</span>,<span class="st">&quot;Min_Level&quot;</span>,<span class="st">&quot;Method&quot;</span>)</span>
-<span id="cb2-71"><a href="#cb2-71" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-72"><a href="#cb2-72" aria-hidden="true" tabindex="-1"></a><span class="co"># Keep only distinct rows, as there are some that repeat due to variables </span></span>
-<span id="cb2-73"><a href="#cb2-73" aria-hidden="true" tabindex="-1"></a><span class="co"># not important for this function.</span></span>
-<span id="cb2-74"><a href="#cb2-74" aria-hidden="true" tabindex="-1"></a>dfl <span class="ot">&lt;-</span> <span class="fu">distinct</span>(dfl)</span>
-<span id="cb2-75"><a href="#cb2-75" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-76"><a href="#cb2-76" aria-hidden="true" tabindex="-1"></a><span class="co"># If user doesn&#39;t input an option for game or wants all games, dfl is returned.</span></span>
-<span id="cb2-77"><a href="#cb2-77" aria-hidden="true" tabindex="-1"></a><span class="co"># If user does input an option for game, then dfl is filtered for that game and returned.</span></span>
-<span id="cb2-78"><a href="#cb2-78" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span>(game <span class="sc">==</span> <span class="st">&quot;all&quot;</span>){</span>
-<span id="cb2-79"><a href="#cb2-79" aria-hidden="true" tabindex="-1"></a>   <span class="fu">return</span>(dfl)</span>
-<span id="cb2-80"><a href="#cb2-80" aria-hidden="true" tabindex="-1"></a>}<span class="cf">else</span>{</span>
-<span id="cb2-81"><a href="#cb2-81" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(dfl <span class="sc">%&gt;%</span></span>
-<span id="cb2-82"><a href="#cb2-82" aria-hidden="true" tabindex="-1"></a>             <span class="fu">filter</span>(Game <span class="sc">==</span> game))</span>
-<span id="cb2-83"><a href="#cb2-83" aria-hidden="true" tabindex="-1"></a>  } <span class="co"># End of if else statement.</span></span>
-<span id="cb2-84"><a href="#cb2-84" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-85"><a href="#cb2-85" aria-hidden="true" tabindex="-1"></a>} <span class="co"># Close of function.</span></span></code></pre></div>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Beginning of details loop.</span></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>      <span class="cf">for</span> (a <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">dim</span>(raw_data[[<span class="dv">1</span>]][[i]][[<span class="dv">1</span>]][[b]])[<span class="dv">1</span>]){</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Get the name, chance, max level, min level, and method.</span></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>        Name   <span class="ot">&lt;-</span> poke[c]</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>        chance <span class="ot">&lt;-</span> raw_data[[<span class="dv">1</span>]][[i]][[<span class="dv">1</span>]][[b]][a,<span class="dv">1</span>]</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>        max    <span class="ot">&lt;-</span> raw_data[[<span class="dv">1</span>]][[i]][[<span class="dv">1</span>]][[b]][a,<span class="dv">3</span>]</span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>        min    <span class="ot">&lt;-</span> raw_data[[<span class="dv">1</span>]][[i]][[<span class="dv">1</span>]][[b]][a,<span class="dv">4</span>]</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>        meth   <span class="ot">&lt;-</span> raw_data[[<span class="dv">1</span>]][[i]][[<span class="dv">1</span>]][[b]][a,<span class="dv">5</span>]</span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Combine all vars into a line for tibble creation</span></span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>        line   <span class="ot">&lt;-</span> <span class="fu">c</span>(Name,loc,gm,chance,max,min,meth)</span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Build dfd tibble.</span></span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>        <span class="co"># If this is the first iteration of the details loop</span></span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>        <span class="co"># then dfd is created with all of the vars.</span></span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>        <span class="co"># If not first iteration, bind dfd with line to add another line to dfd.</span></span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span>(a <span class="sc">==</span> <span class="dv">1</span>){</span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>          dfd <span class="ot">&lt;-</span> <span class="fu">tibble</span>(Name,loc,gm,chance,max,min,meth)</span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>        } <span class="cf">else</span>{</span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>          dfd <span class="ot">&lt;-</span> <span class="fu">rbind</span>(dfd,line)</span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a>        } <span class="co"># Close if else statement.</span></span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>      } <span class="co"># Close details loop.</span></span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Build dfg tibble.</span></span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a>      <span class="co"># If first iteration of game loop, dfg is dfd.</span></span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a>      <span class="co"># If not first iteration, dfg is binded with dfd to add more lines.</span></span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span>(b <span class="sc">==</span> <span class="dv">1</span>)</span>
+<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a>      {dfg <span class="ot">&lt;-</span> dfd</span>
+<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a>      }<span class="cf">else</span>{</span>
+<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a>        dfg <span class="ot">&lt;-</span> <span class="fu">rbind</span>(dfg,dfd)</span>
+<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a>      } <span class="co"># Close if else statement</span></span>
+<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a>    } <span class="co"># Close game loop</span></span>
+<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Create final tibble</span></span>
+<span id="cb2-63"><a href="#cb2-63" aria-hidden="true" tabindex="-1"></a>    <span class="co"># If first iteration of location loop, dfl is the final dfg from the game loop.</span></span>
+<span id="cb2-64"><a href="#cb2-64" aria-hidden="true" tabindex="-1"></a>    <span class="co"># If not first iteration, dfl is binded with the most recent dfg to add more lines.</span></span>
+<span id="cb2-65"><a href="#cb2-65" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span>(i<span class="sc">==</span><span class="dv">1</span>){</span>
+<span id="cb2-66"><a href="#cb2-66" aria-hidden="true" tabindex="-1"></a>      dfl <span class="ot">&lt;-</span> dfg</span>
+<span id="cb2-67"><a href="#cb2-67" aria-hidden="true" tabindex="-1"></a>    }<span class="cf">else</span>{</span>
+<span id="cb2-68"><a href="#cb2-68" aria-hidden="true" tabindex="-1"></a>      dfl <span class="ot">&lt;-</span> <span class="fu">rbind</span>(dfl,dfg)</span>
+<span id="cb2-69"><a href="#cb2-69" aria-hidden="true" tabindex="-1"></a>    } <span class="co"># End if else statement</span></span>
+<span id="cb2-70"><a href="#cb2-70" aria-hidden="true" tabindex="-1"></a>  } <span class="co"># End location loop</span></span>
+<span id="cb2-71"><a href="#cb2-71" aria-hidden="true" tabindex="-1"></a>  <span class="co"># End of all loops</span></span>
+<span id="cb2-72"><a href="#cb2-72" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-73"><a href="#cb2-73" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Rename variables in final dfl.</span></span>
+<span id="cb2-74"><a href="#cb2-74" aria-hidden="true" tabindex="-1"></a>  <span class="fu">names</span>(dfl) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Name&quot;</span>,<span class="st">&quot;Location&quot;</span>,<span class="st">&quot;Game&quot;</span>,<span class="st">&quot;Chance&quot;</span>,<span class="st">&quot;Max_Level&quot;</span>,<span class="st">&quot;Min_Level&quot;</span>,<span class="st">&quot;Method&quot;</span>)</span>
+<span id="cb2-75"><a href="#cb2-75" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-76"><a href="#cb2-76" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Keep only distinct rows, as there are some that repeat due to variables </span></span>
+<span id="cb2-77"><a href="#cb2-77" aria-hidden="true" tabindex="-1"></a>  <span class="co"># not important for this function.</span></span>
+<span id="cb2-78"><a href="#cb2-78" aria-hidden="true" tabindex="-1"></a>  dfl <span class="ot">&lt;-</span> <span class="fu">distinct</span>(dfl)</span>
+<span id="cb2-79"><a href="#cb2-79" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-80"><a href="#cb2-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-81"><a href="#cb2-81" aria-hidden="true" tabindex="-1"></a>  <span class="co"># If first iteration of main loop, final tibble is dfl tibble.</span></span>
+<span id="cb2-82"><a href="#cb2-82" aria-hidden="true" tabindex="-1"></a>  <span class="co"># If not first iteration, final tibble is binded with df1 tibble</span></span>
+<span id="cb2-83"><a href="#cb2-83" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(c <span class="sc">==</span> <span class="dv">1</span>){</span>
+<span id="cb2-84"><a href="#cb2-84" aria-hidden="true" tabindex="-1"></a>    final <span class="ot">&lt;-</span> dfl</span>
+<span id="cb2-85"><a href="#cb2-85" aria-hidden="true" tabindex="-1"></a>  }<span class="cf">else</span>{</span>
+<span id="cb2-86"><a href="#cb2-86" aria-hidden="true" tabindex="-1"></a>    final <span class="ot">&lt;-</span> <span class="fu">rbind</span>(final,dfl)</span>
+<span id="cb2-87"><a href="#cb2-87" aria-hidden="true" tabindex="-1"></a>  } <span class="co"># End if else statement</span></span>
+<span id="cb2-88"><a href="#cb2-88" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-89"><a href="#cb2-89" aria-hidden="true" tabindex="-1"></a>  } <span class="co"># End main loop</span></span>
+<span id="cb2-90"><a href="#cb2-90" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-91"><a href="#cb2-91" aria-hidden="true" tabindex="-1"></a>  <span class="co"># If user wants all games returned, no change to final tibble.</span></span>
+<span id="cb2-92"><a href="#cb2-92" aria-hidden="true" tabindex="-1"></a>  <span class="co"># If user wants specific games, final is filtered for these games.</span></span>
+<span id="cb2-93"><a href="#cb2-93" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="st">&quot;all&quot;</span> <span class="sc">%in%</span> game){</span>
+<span id="cb2-94"><a href="#cb2-94" aria-hidden="true" tabindex="-1"></a>    final <span class="ot">&lt;-</span> final</span>
+<span id="cb2-95"><a href="#cb2-95" aria-hidden="true" tabindex="-1"></a>  }<span class="cf">else</span>{</span>
+<span id="cb2-96"><a href="#cb2-96" aria-hidden="true" tabindex="-1"></a>    final <span class="ot">&lt;-</span> final <span class="sc">%&gt;%</span></span>
+<span id="cb2-97"><a href="#cb2-97" aria-hidden="true" tabindex="-1"></a>      <span class="fu">filter</span>(Game <span class="sc">%in%</span> game)</span>
+<span id="cb2-98"><a href="#cb2-98" aria-hidden="true" tabindex="-1"></a>  } <span class="co"># End if else statement.</span></span>
+<span id="cb2-99"><a href="#cb2-99" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-100"><a href="#cb2-100" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Capitalize name of the Pokemon.</span></span>
+<span id="cb2-101"><a href="#cb2-101" aria-hidden="true" tabindex="-1"></a>  final<span class="sc">$</span>Name <span class="ot">&lt;-</span> <span class="fu">str_to_sentence</span>(final<span class="sc">$</span>Name)</span>
+<span id="cb2-102"><a href="#cb2-102" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-103"><a href="#cb2-103" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Return final tibble.</span></span>
+<span id="cb2-104"><a href="#cb2-104" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(final)</span>
+<span id="cb2-105"><a href="#cb2-105" aria-hidden="true" tabindex="-1"></a>  } <span class="co"># End function.</span></span></code></pre></div>
 <h2 id="stats-function">Stats Function</h2>
 <p>Another major portion of the Pokemon video games is battling. During a battle you want to make sure you have the strongest Pokemon, the way their strength is determined is through their “base stats”.</p>
 <p>Their base stats are:<br />
@@ -765,69 +786,71 @@ body {
 <h1 id="basic-functionality">Basic Functionality</h1>
 <p>Below we show a basic example of each function.</p>
 <h2 id="encounter-example">Encounter Example</h2>
-<p>Here we test the encounter function with my favorite starter Pokemon <strong>CHARMANDER</strong>.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use the function and save results in an object</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>charmander <span class="ot">&lt;-</span> <span class="fu">encounter</span>(<span class="st">&quot;charmander&quot;</span>)</span>
+<p>Here we test the encounter function with a vector we create called mons that we will use throughout the examples. Also, we are only requesting information of the red and fire red versions of the games.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a vector of four Pokemon</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>mons <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;charmander&quot;</span>,<span class="st">&quot;pidgey&quot;</span>,<span class="st">&quot;abra&quot;</span>,<span class="st">&quot;beedrill&quot;</span>) </span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Print the object</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(charmander)</span></code></pre></div>
-<pre><code>## # A tibble: 9 x 6
-##   Location            Game       Chance Max_Level Min_Level Method
-##   &lt;chr&gt;               &lt;chr&gt;       &lt;int&gt;     &lt;int&gt;     &lt;int&gt; &lt;chr&gt; 
-## 1 pallet-town-area    red           100         5         5 gift  
-## 2 pallet-town-area    blue          100         5         5 gift  
-## 3 pallet-town-area    firered       100         5         5 gift  
-## 4 pallet-town-area    leafgreen     100         5         5 gift  
-## 5 pallet-town-area    heartgold     100         5         5 gift  
-## 6 pallet-town-area    soulsilver    100         5         5 gift  
-## 7 kanto-route-24-area yellow        100        10        10 gift  
-## 8 lumiose-city-area   x             100        10        10 gift  
-## 9 lumiose-city-area   y             100        10        10 gift</code></pre>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Use the function and save results in an object</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>enc_example <span class="ot">&lt;-</span> <span class="fu">encounter</span>(<span class="at">poke =</span> mons, <span class="at">game =</span> <span class="fu">c</span>(<span class="st">&quot;red&quot;</span>,<span class="st">&quot;firered&quot;</span>))</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Print the object</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(enc_example)</span></code></pre></div>
+<pre><code>## # A tibble: 91 x 7
+##    Name       Location            Game    Chance Max_Level Min_Level Method
+##    &lt;chr&gt;      &lt;chr&gt;               &lt;chr&gt;   &lt;chr&gt;  &lt;chr&gt;     &lt;chr&gt;     &lt;chr&gt; 
+##  1 Charmander pallet-town-area    red     100    5         5         gift  
+##  2 Charmander pallet-town-area    firered 100    5         5         gift  
+##  3 Pidgey     kanto-route-12-area red     20     25        25        walk  
+##  4 Pidgey     kanto-route-12-area red     15     23        23        walk  
+##  5 Pidgey     kanto-route-12-area red     5      27        27        walk  
+##  6 Pidgey     kanto-route-12-area firered 10     23        23        walk  
+##  7 Pidgey     kanto-route-12-area firered 10     25        25        walk  
+##  8 Pidgey     kanto-route-12-area firered 5      27        27        walk  
+##  9 Pidgey     kanto-route-12-area firered 4      23        23        walk  
+## 10 Pidgey     kanto-route-12-area firered 1      23        23        walk  
+## # ... with 81 more rows</code></pre>
 <h2 id="stats-example">Stats Example</h2>
-<p>Here is an example of the <code>stats</code> function, with a vector of four Pokemon.</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a vector of four Pokemon</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>mons <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;charizard&quot;</span>,<span class="st">&quot;pidgey&quot;</span>,<span class="st">&quot;abra&quot;</span>,<span class="st">&quot;beedrill&quot;</span>) </span>
+<p>Here is an example of the <code>stats</code> function, with the mons vector.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use the function on the vector</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>stat_example <span class="ot">&lt;-</span> <span class="fu">stats</span>(mons)</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Use the function on the vector</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>stat_example <span class="ot">&lt;-</span> <span class="fu">stats</span>(mons)</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Print results</span></span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(stat_example)</span></code></pre></div>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Print results</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(stat_example)</span></code></pre></div>
 <pre><code>## # A tibble: 4 x 7
-##   name         hp attack defense `special-attack` `special-defense` speed
-##   &lt;chr&gt;     &lt;int&gt;  &lt;int&gt;   &lt;int&gt;            &lt;int&gt;             &lt;int&gt; &lt;int&gt;
-## 1 Charizard    78     84      78              109                85   100
-## 2 Pidgey       40     45      40               35                35    56
-## 3 Abra         25     20      15              105                55    90
-## 4 Beedrill     65     90      40               45                80    75</code></pre>
+##   name          hp attack defense `special-attack` `special-defense` speed
+##   &lt;chr&gt;      &lt;int&gt;  &lt;int&gt;   &lt;int&gt;            &lt;int&gt;             &lt;int&gt; &lt;int&gt;
+## 1 Charmander    39     52      43               60                50    65
+## 2 Pidgey        40     45      40               35                35    56
+## 3 Abra          25     20      15              105                55    90
+## 4 Beedrill      65     90      40               45                80    75</code></pre>
 <h2 id="size-example">Size Example</h2>
-<p>Here we test the <code>size</code> function, with the same vector of four Pokemon from the <code>stats</code> example.</p>
+<p>Here we test the <code>size</code> function, with the same vector of four Pokemon.</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use the function on the vector</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>size_example <span class="ot">&lt;-</span> <span class="fu">size</span>(mons)</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Print results</span></span>
 <span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(size_example)</span></code></pre></div>
 <pre><code>## # A tibble: 4 x 3
-##   Name      Height_Meters Weight_Kilograms
-##   &lt;chr&gt;             &lt;dbl&gt;            &lt;dbl&gt;
-## 1 Charizard           1.7             90.5
-## 2 Pidgey              0.3              1.8
-## 3 Abra                0.9             19.5
-## 4 Beedrill            1               29.5</code></pre>
+##   Name       Height_Meters Weight_Kilograms
+##   &lt;chr&gt;              &lt;dbl&gt;            &lt;dbl&gt;
+## 1 Charmander           0.6              8.5
+## 2 Pidgey               0.3              1.8
+## 3 Abra                 0.9             19.5
+## 4 Beedrill             1               29.5</code></pre>
 <h2 id="dex-example">Dex Example</h2>
-<p>Here we test the <code>dex</code> function. We are using regions with dex ids 1 through 5, and only returning results on our same four Pokemon from the previous two examples. Any <code>NA</code> means that the Pokemon is not in that Pokedex.</p>
+<p>Here we test the <code>dex</code> function. We are using regions with dex ids 1 through 5, and only returning results on our same four Pokemon. Any <code>NA</code> means that the Pokemon is not in that Pokedex.</p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use function on vectors</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>dex_example <span class="ot">&lt;-</span> <span class="fu">dex</span>(<span class="at">reg =</span> <span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>), <span class="at">poke =</span> mons)</span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Print results</span></span>
 <span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(dex_example)</span></code></pre></div>
 <pre><code>## # A tibble: 4 x 6
-##   Name      National_Dex_Number Kanto_Dex_Number `Original-johto_Dex_Number` Hoenn_Dex_Number `Original-sinnoh_Dex_Number`
-##   &lt;chr&gt;                   &lt;int&gt;            &lt;int&gt;                       &lt;int&gt;            &lt;int&gt;                        &lt;int&gt;
-## 1 Charizard                   6                6                         231               NA                           NA
-## 2 Beedrill                   15               15                          29               NA                           NA
-## 3 Pidgey                     16               16                          10               NA                           NA
-## 4 Abra                       63               63                          89               39                           20</code></pre>
+##   Name       National_Dex_Number Kanto_Dex_Number `Original-johto_Dex_Number` Hoenn_Dex_Number `Original-sinnoh_Dex_Number`
+##   &lt;chr&gt;                    &lt;int&gt;            &lt;int&gt;                       &lt;int&gt;            &lt;int&gt;                        &lt;int&gt;
+## 1 Charmander                   4                4                         229               NA                           NA
+## 2 Beedrill                    15               15                          29               NA                           NA
+## 3 Pidgey                      16               16                          10               NA                           NA
+## 4 Abra                        63               63                          89               39                           20</code></pre>
 <h2 id="egg-group-example">Egg Group Example</h2>
 <p>Here we test the <code>egg_group</code> function. We are using all egg groups, and returning the information for the Pokemon in our <code>mons</code> vector that we have been using. Any <code>NA</code> means the Pokemon doesn’t have a second egg group.</p>
 <div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use function on mons vector.</span></span>
@@ -836,12 +859,12 @@ body {
 <span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Return the tibble.</span></span>
 <span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(egg_example)</span></code></pre></div>
 <pre><code>## # A tibble: 4 x 3
-##   Name      Egg_Group_1 Egg_Group_2
-##   &lt;chr&gt;     &lt;chr&gt;       &lt;chr&gt;      
-## 1 Charizard monster     dragon     
-## 2 Beedrill  bug         &lt;NA&gt;       
-## 3 Pidgey    flying      &lt;NA&gt;       
-## 4 Abra      humanshape  &lt;NA&gt;</code></pre>
+##   Name       Egg_Group_1 Egg_Group_2
+##   &lt;chr&gt;      &lt;chr&gt;       &lt;chr&gt;      
+## 1 Charmander monster     dragon     
+## 2 Beedrill   bug         &lt;NA&gt;       
+## 3 Pidgey     flying      &lt;NA&gt;       
+## 4 Abra       humanshape  &lt;NA&gt;</code></pre>
 <h2 id="experience-function-example">Experience Function Example</h2>
 <p>Here we test the <code>exp_func</code> function. We are using all rate groups, the same <code>mons</code> vector we have been using, and levels 10, 25, 50, 75, and 100.</p>
 <div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use function on mons vector and for the specific levels we want.</span></span>
@@ -850,12 +873,12 @@ body {
 <span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Return the tibble.</span></span>
 <span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(exp_example)</span></code></pre></div>
 <pre><code>## # A tibble: 4 x 7
-##   Name      Description Level_10 Level_25 Level_50 Level_75 Level_100
-##   &lt;chr&gt;     &lt;chr&gt;          &lt;int&gt;    &lt;int&gt;    &lt;int&gt;    &lt;int&gt;     &lt;int&gt;
-## 1 Beedrill  medium          1000    15625   125000   421875   1000000
-## 2 Pidgey    medium slow      560    11735   117360   429235   1059860
-## 3 Abra      medium slow      560    11735   117360   429235   1059860
-## 4 Charizard medium slow      560    11735   117360   429235   1059860</code></pre>
+##   Name       Description Level_10 Level_25 Level_50 Level_75 Level_100
+##   &lt;chr&gt;      &lt;chr&gt;          &lt;int&gt;    &lt;int&gt;    &lt;int&gt;    &lt;int&gt;     &lt;int&gt;
+## 1 Beedrill   medium          1000    15625   125000   421875   1000000
+## 2 Charmander medium slow      560    11735   117360   429235   1059860
+## 3 Pidgey     medium slow      560    11735   117360   429235   1059860
+## 4 Abra       medium slow      560    11735   117360   429235   1059860</code></pre>
 
 </body>
 </html>

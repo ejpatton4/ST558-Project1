@@ -3,7 +3,7 @@ Poke API Vignette
 Evan Patton
 9/27/2021
 
-## Introduction
+# Introduction
 
 This space reserved for introduction, talk about the project, my
 thoughts, and then an overview of my work.
@@ -46,98 +46,124 @@ encounter the Pokemon (walking in tall grass vs being given as a gift as
 an example.)
 
 The function `encounter` is built below and an example will be shown
-later. `encounter` takes two arguments, the first one is not optional,
-and that is the Pokemon you want to find. The second argument is
-optional, and that is what game from the series you want to return data
-on, if no game is selected then all games will be returned in the final
-tibble. **Both arguments require quoted strings**
+later. `encounter` takes two arguments, the first one is `poke` and is
+not optional. That is for the Pokemon you want to find, it can be for a
+single character string or a vector of them. The second argument,
+`game`, is optional, and that is what game from the series you want to
+return data on, if no game is selected then all games will be returned
+in the final tibble.
+
+Of note, this function will error if you request the data for a Pokemon
+not able to be acquired. For instance Charizard can’t just be found in a
+game you have to evolve a Charmander to a Charizard in order to have
+one.
 
 ``` r
-# Starting the function
+# Define function
 encounter <- function(poke, game = "all") {
-
-# Converting inputs to lower case for flexability
-poke <- tolower(poke)
-game <- tolower(game)
-
-# Get the requested data   
-raw_data <- fromJSON(paste0("https://pokeapi.co/api/v2/pokemon/",poke,"/encounters"), flatten = TRUE)
-
-
-# Start loops.
-# Beginning of location loop.
-for (i in 1:dim(raw_data)[1]) {
   
-  # Get the location from raw.
-  loc <- raw_data[i,2]
+  # Converting inputs to lower case for flexibility
+  poke <- tolower(poke)
+  game <- tolower(game)
   
-  # Beginning of game loop.
-  for (b in 1:dim(raw_data[[1]][[i]])[1]){
+  # Start all loops.
+  # Start loop for specific pokemon.
+  for(c in 1:length(poke)){
+  
+  # Get the requested data   
+  raw_data <- fromJSON(paste0("https://pokeapi.co/api/v2/pokemon/",poke[c],"/encounters"), flatten = TRUE)
+  
+  
+  # Beginning of location loop.
+  for (i in 1:dim(raw_data)[1]) {
     
-    # Get the specific game from raw.
-    gm <- raw_data[[1]][[i]][b,3]
+    # Get the location from raw.
+    loc <- raw_data[i,2]
     
-    # Beginning of details loop.
-    for (a in 1:dim(raw_data[[1]][[i]][[1]][[b]])[1]){
+    # Beginning of game loop.
+    for (b in 1:dim(raw_data[[1]][[i]])[1]){
       
-      # Get the chance, max level, min level, and method.
-      chance <- raw_data[[1]][[i]][[1]][[b]][a,1]
-      max    <- raw_data[[1]][[i]][[1]][[b]][a,3]
-      min    <- raw_data[[1]][[i]][[1]][[b]][a,4]
-      meth   <- raw_data[[1]][[i]][[1]][[b]][a,5]
+      # Get the specific game from raw.
+      gm <- raw_data[[1]][[i]][b,3]
       
-      # Combine all vars into a line for tibble creation
-      line   <- c(loc,gm,chance,max,min,meth)
-         
-      # Build dfd tibble.
-      # If this is the first iteration of the details loop
-      # then dfd is created with all of the vars.
-      # If not first iteration, bind dfd with line to add another line to dfd.
-      if(a == 1){
-        dfd <- tibble(loc,gm,chance,max,min,meth)
-      } else{
+      # Beginning of details loop.
+      for (a in 1:dim(raw_data[[1]][[i]][[1]][[b]])[1]){
+        
+        # Get the name, chance, max level, min level, and method.
+        Name   <- poke[c]
+        chance <- raw_data[[1]][[i]][[1]][[b]][a,1]
+        max    <- raw_data[[1]][[i]][[1]][[b]][a,3]
+        min    <- raw_data[[1]][[i]][[1]][[b]][a,4]
+        meth   <- raw_data[[1]][[i]][[1]][[b]][a,5]
+        
+        # Combine all vars into a line for tibble creation
+        line   <- c(Name,loc,gm,chance,max,min,meth)
+        
+        # Build dfd tibble.
+        # If this is the first iteration of the details loop
+        # then dfd is created with all of the vars.
+        # If not first iteration, bind dfd with line to add another line to dfd.
+        if(a == 1){
+          dfd <- tibble(Name,loc,gm,chance,max,min,meth)
+        } else{
           dfd <- rbind(dfd,line)
         } # Close if else statement.
       } # Close details loop.
-  
-    # Build dfg tibble.
-    # If first iteration of game loop, dfg is dfd.
-    # If not first iteration, dfg is binded with dfd to add more lines.
-    if(b == 1)
-    {dfg <- dfd
-    }else{
-      dfg <- rbind(dfg,dfd)
-    } # Close if else statement
+      
+      # Build dfg tibble.
+      # If first iteration of game loop, dfg is dfd.
+      # If not first iteration, dfg is binded with dfd to add more lines.
+      if(b == 1)
+      {dfg <- dfd
+      }else{
+        dfg <- rbind(dfg,dfd)
+      } # Close if else statement
     } # Close game loop
     
-  # Create final tibble
-  # If first iteration of location loop, dfl is the final dfg from the game loop.
-  # If not first iteration, dfl is binded with the most recent dfg to add more lines.
-  if(i==1){
-    dfl <- dfg
-  }else{
-    dfl <- rbind(dfl,dfg)
-  } # End if else statement
+    # Create final tibble
+    # If first iteration of location loop, dfl is the final dfg from the game loop.
+    # If not first iteration, dfl is binded with the most recent dfg to add more lines.
+    if(i==1){
+      dfl <- dfg
+    }else{
+      dfl <- rbind(dfl,dfg)
+    } # End if else statement
   } # End location loop
-# End of all loops
+  # End of all loops
+  
+  # Rename variables in final dfl.
+  names(dfl) <- c("Name","Location","Game","Chance","Max_Level","Min_Level","Method")
+  
+  # Keep only distinct rows, as there are some that repeat due to variables 
+  # not important for this function.
+  dfl <- distinct(dfl)
+  
 
-# Rename variables in final dfl.
-names(dfl) <- c("Location","Game","Chance","Max_Level","Min_Level","Method")
-
-# Keep only distinct rows, as there are some that repeat due to variables 
-# not important for this function.
-dfl <- distinct(dfl)
-
-# If user doesn't input an option for game or wants all games, dfl is returned.
-# If user does input an option for game, then dfl is filtered for that game and returned.
-if(game == "all"){
-   return(dfl)
-}else{
-    return(dfl %>%
-             filter(Game == game))
-  } # End of if else statement.
-
-} # Close of function.
+  # If first iteration of main loop, final tibble is dfl tibble.
+  # If not first iteration, final tibble is binded with df1 tibble
+  if(c == 1){
+    final <- dfl
+  }else{
+    final <- rbind(final,dfl)
+  } # End if else statement
+  
+  } # End main loop
+  
+  # If user wants all games returned, no change to final tibble.
+  # If user wants specific games, final is filtered for these games.
+  if("all" %in% game){
+    final <- final
+  }else{
+    final <- final %>%
+      filter(Game %in% game)
+  } # End if else statement.
+  
+  # Capitalize name of the Pokemon.
+  final$Name <- str_to_sentence(final$Name)
+  
+  # Return final tibble.
+  return(final)
+  } # End function.
 ```
 
 ## Stats Function
@@ -718,39 +744,41 @@ Below we show a basic example of each function.
 
 ## Encounter Example
 
-Here we test the encounter function with my favorite starter Pokemon
-**CHARMANDER**.
-
-``` r
-# Use the function and save results in an object
-charmander <- encounter("charmander")
-
-# Print the object
-print(charmander)
-```
-
-    ## # A tibble: 9 x 6
-    ##   Location            Game       Chance Max_Level Min_Level Method
-    ##   <chr>               <chr>       <int>     <int>     <int> <chr> 
-    ## 1 pallet-town-area    red           100         5         5 gift  
-    ## 2 pallet-town-area    blue          100         5         5 gift  
-    ## 3 pallet-town-area    firered       100         5         5 gift  
-    ## 4 pallet-town-area    leafgreen     100         5         5 gift  
-    ## 5 pallet-town-area    heartgold     100         5         5 gift  
-    ## 6 pallet-town-area    soulsilver    100         5         5 gift  
-    ## 7 kanto-route-24-area yellow        100        10        10 gift  
-    ## 8 lumiose-city-area   x             100        10        10 gift  
-    ## 9 lumiose-city-area   y             100        10        10 gift
-
-## Stats Example
-
-Here is an example of the `stats` function, with a vector of four
-Pokemon.
+Here we test the encounter function with a vector we create called mons
+that we will use throughout the examples. Also, we are only requesting
+information of the red and fire red versions of the games.
 
 ``` r
 # Create a vector of four Pokemon
-mons <- c("charizard","pidgey","abra","beedrill") 
+mons <- c("charmander","pidgey","abra","beedrill") 
 
+# Use the function and save results in an object
+enc_example <- encounter(poke = mons, game = c("red","firered"))
+
+# Print the object
+print(enc_example)
+```
+
+    ## # A tibble: 91 x 7
+    ##    Name       Location            Game    Chance Max_Level Min_Level Method
+    ##    <chr>      <chr>               <chr>   <chr>  <chr>     <chr>     <chr> 
+    ##  1 Charmander pallet-town-area    red     100    5         5         gift  
+    ##  2 Charmander pallet-town-area    firered 100    5         5         gift  
+    ##  3 Pidgey     kanto-route-12-area red     20     25        25        walk  
+    ##  4 Pidgey     kanto-route-12-area red     15     23        23        walk  
+    ##  5 Pidgey     kanto-route-12-area red     5      27        27        walk  
+    ##  6 Pidgey     kanto-route-12-area firered 10     23        23        walk  
+    ##  7 Pidgey     kanto-route-12-area firered 10     25        25        walk  
+    ##  8 Pidgey     kanto-route-12-area firered 5      27        27        walk  
+    ##  9 Pidgey     kanto-route-12-area firered 4      23        23        walk  
+    ## 10 Pidgey     kanto-route-12-area firered 1      23        23        walk  
+    ## # ... with 81 more rows
+
+## Stats Example
+
+Here is an example of the `stats` function, with the mons vector.
+
+``` r
 # Use the function on the vector
 stat_example <- stats(mons)
 
@@ -759,17 +787,16 @@ print(stat_example)
 ```
 
     ## # A tibble: 4 x 7
-    ##   name         hp attack defense `special-attack` `special-defense` speed
-    ##   <chr>     <int>  <int>   <int>            <int>             <int> <int>
-    ## 1 Charizard    78     84      78              109                85   100
-    ## 2 Pidgey       40     45      40               35                35    56
-    ## 3 Abra         25     20      15              105                55    90
-    ## 4 Beedrill     65     90      40               45                80    75
+    ##   name          hp attack defense `special-attack` `special-defense` speed
+    ##   <chr>      <int>  <int>   <int>            <int>             <int> <int>
+    ## 1 Charmander    39     52      43               60                50    65
+    ## 2 Pidgey        40     45      40               35                35    56
+    ## 3 Abra          25     20      15              105                55    90
+    ## 4 Beedrill      65     90      40               45                80    75
 
 ## Size Example
 
-Here we test the `size` function, with the same vector of four Pokemon
-from the `stats` example.
+Here we test the `size` function, with the same vector of four Pokemon.
 
 ``` r
 # Use the function on the vector
@@ -780,19 +807,18 @@ print(size_example)
 ```
 
     ## # A tibble: 4 x 3
-    ##   Name      Height_Meters Weight_Kilograms
-    ##   <chr>             <dbl>            <dbl>
-    ## 1 Charizard           1.7             90.5
-    ## 2 Pidgey              0.3              1.8
-    ## 3 Abra                0.9             19.5
-    ## 4 Beedrill            1               29.5
+    ##   Name       Height_Meters Weight_Kilograms
+    ##   <chr>              <dbl>            <dbl>
+    ## 1 Charmander           0.6              8.5
+    ## 2 Pidgey               0.3              1.8
+    ## 3 Abra                 0.9             19.5
+    ## 4 Beedrill             1               29.5
 
 ## Dex Example
 
 Here we test the `dex` function. We are using regions with dex ids 1
-through 5, and only returning results on our same four Pokemon from the
-previous two examples. Any `NA` means that the Pokemon is not in that
-Pokedex.
+through 5, and only returning results on our same four Pokemon. Any `NA`
+means that the Pokemon is not in that Pokedex.
 
 ``` r
 # Use function on vectors
@@ -803,12 +829,12 @@ print(dex_example)
 ```
 
     ## # A tibble: 4 x 6
-    ##   Name      National_Dex_Number Kanto_Dex_Number `Original-johto_Dex_Number` Hoenn_Dex_Number `Original-sinnoh_Dex_Number`
-    ##   <chr>                   <int>            <int>                       <int>            <int>                        <int>
-    ## 1 Charizard                   6                6                         231               NA                           NA
-    ## 2 Beedrill                   15               15                          29               NA                           NA
-    ## 3 Pidgey                     16               16                          10               NA                           NA
-    ## 4 Abra                       63               63                          89               39                           20
+    ##   Name       National_Dex_Number Kanto_Dex_Number `Original-johto_Dex_Number` Hoenn_Dex_Number `Original-sinnoh_Dex_Number`
+    ##   <chr>                    <int>            <int>                       <int>            <int>                        <int>
+    ## 1 Charmander                   4                4                         229               NA                           NA
+    ## 2 Beedrill                    15               15                          29               NA                           NA
+    ## 3 Pidgey                      16               16                          10               NA                           NA
+    ## 4 Abra                        63               63                          89               39                           20
 
 ## Egg Group Example
 
@@ -826,12 +852,12 @@ print(egg_example)
 ```
 
     ## # A tibble: 4 x 3
-    ##   Name      Egg_Group_1 Egg_Group_2
-    ##   <chr>     <chr>       <chr>      
-    ## 1 Charizard monster     dragon     
-    ## 2 Beedrill  bug         <NA>       
-    ## 3 Pidgey    flying      <NA>       
-    ## 4 Abra      humanshape  <NA>
+    ##   Name       Egg_Group_1 Egg_Group_2
+    ##   <chr>      <chr>       <chr>      
+    ## 1 Charmander monster     dragon     
+    ## 2 Beedrill   bug         <NA>       
+    ## 3 Pidgey     flying      <NA>       
+    ## 4 Abra       humanshape  <NA>
 
 ## Experience Function Example
 
@@ -848,9 +874,9 @@ print(exp_example)
 ```
 
     ## # A tibble: 4 x 7
-    ##   Name      Description Level_10 Level_25 Level_50 Level_75 Level_100
-    ##   <chr>     <chr>          <int>    <int>    <int>    <int>     <int>
-    ## 1 Beedrill  medium          1000    15625   125000   421875   1000000
-    ## 2 Pidgey    medium slow      560    11735   117360   429235   1059860
-    ## 3 Abra      medium slow      560    11735   117360   429235   1059860
-    ## 4 Charizard medium slow      560    11735   117360   429235   1059860
+    ##   Name       Description Level_10 Level_25 Level_50 Level_75 Level_100
+    ##   <chr>      <chr>          <int>    <int>    <int>    <int>     <int>
+    ## 1 Beedrill   medium          1000    15625   125000   421875   1000000
+    ## 2 Charmander medium slow      560    11735   117360   429235   1059860
+    ## 3 Pidgey     medium slow      560    11735   117360   429235   1059860
+    ## 4 Abra       medium slow      560    11735   117360   429235   1059860
