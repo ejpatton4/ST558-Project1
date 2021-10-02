@@ -511,6 +511,47 @@ grp <- raw_data$name
 } # End of function
 ```
 
+Here is a table showing the relationship between the egg group id numbers and their associated names.
+
+```{r egg group table, echo = FALSE}
+
+# Define function
+get_group_ids <- function(x){
+  
+  # Get requested data
+  raw_data <- fromJSON("https://pokeapi.co/api/v2/egg-group/")
+  
+  # Begin loop
+  for(i in 1:length(x)){
+    
+    # SAve group ID number.
+    group_id <- x[i]
+    
+    # Save group name.
+    group_name <- raw_data$results[["name"]][i]
+    
+    # create row for the group info
+    group_row_info <- tibble(group_id,group_name)
+    
+    # If first iteration of loop final tibble is the group row info
+    # If not bind final tibble with the newest group row info
+    if(i == 1){
+      final_tibble <- group_row_info
+    }else{
+      final_tibble <- rbind(final_tibble,group_row_info)
+    } # End if else statement
+} # End of loop
+
+  # Return tibble
+  return(final_tibble)
+} # End Function
+
+# Get the data for the table
+egg_groups <- get_group_ids(c(1:15))
+
+# create table
+kable(egg_groups)
+```
 
 
 

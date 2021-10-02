@@ -541,6 +541,27 @@ grp <- raw_data$name
 } # End of function
 ```
 
+Here is a table showing the relationship between the egg group id
+numbers and their associated names.
+
+| group\_id | group\_name   |
+|----------:|:--------------|
+|         1 | monster       |
+|         2 | water1        |
+|         3 | bug           |
+|         4 | flying        |
+|         5 | ground        |
+|         6 | fairy         |
+|         7 | plant         |
+|         8 | humanshape    |
+|         9 | water3        |
+|        10 | mineral       |
+|        11 | indeterminate |
+|        12 | water2        |
+|        13 | ditto         |
+|        14 | dragon        |
+|        15 | no-eggs       |
+
 # Basic Functionality
 
 Below we show as basic example of each function.
@@ -632,12 +653,13 @@ print(dex_example)
 ```
 
     ## # A tibble: 4 x 6
-    ##   Name      National_Dex_Number Kanto_Dex_Number `Original-johto_Dex_Number` Hoenn_Dex_Number `Original-sinnoh_Dex_Number`
-    ##   <chr>                   <int>            <int>                       <int>            <int>                        <int>
-    ## 1 Charizard                   6                6                         231               NA                           NA
-    ## 2 Beedrill                   15               15                          29               NA                           NA
-    ## 3 Pidgey                     16               16                          10               NA                           NA
-    ## 4 Abra                       63               63                          89               39                           20
+    ##   Name      National_Dex_Number Kanto_Dex_Number `Original-johto_Dex~ Hoenn_Dex_Number
+    ##   <chr>                   <int>            <int>                <int>            <int>
+    ## 1 Charizard                   6                6                  231               NA
+    ## 2 Beedrill                   15               15                   29               NA
+    ## 3 Pidgey                     16               16                   10               NA
+    ## 4 Abra                       63               63                   89               39
+    ## # ... with 1 more variable: Original-sinnoh_Dex_Number <int>
 
 ## Egg Group Example
 

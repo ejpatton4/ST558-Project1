@@ -545,6 +545,77 @@ body {
 <span id="cb6-113"><a href="#cb6-113" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Return final tibble to user. </span></span>
 <span id="cb6-114"><a href="#cb6-114" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(final)</span>
 <span id="cb6-115"><a href="#cb6-115" aria-hidden="true" tabindex="-1"></a>} <span class="co"># End of function</span></span></code></pre></div>
+<p>Here is a table showing the relationship between the egg group id numbers and their associated names.</p>
+<table>
+<thead>
+<tr class="header">
+<th align="right">group_id</th>
+<th align="left">group_name</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">1</td>
+<td align="left">monster</td>
+</tr>
+<tr class="even">
+<td align="right">2</td>
+<td align="left">water1</td>
+</tr>
+<tr class="odd">
+<td align="right">3</td>
+<td align="left">bug</td>
+</tr>
+<tr class="even">
+<td align="right">4</td>
+<td align="left">flying</td>
+</tr>
+<tr class="odd">
+<td align="right">5</td>
+<td align="left">ground</td>
+</tr>
+<tr class="even">
+<td align="right">6</td>
+<td align="left">fairy</td>
+</tr>
+<tr class="odd">
+<td align="right">7</td>
+<td align="left">plant</td>
+</tr>
+<tr class="even">
+<td align="right">8</td>
+<td align="left">humanshape</td>
+</tr>
+<tr class="odd">
+<td align="right">9</td>
+<td align="left">water3</td>
+</tr>
+<tr class="even">
+<td align="right">10</td>
+<td align="left">mineral</td>
+</tr>
+<tr class="odd">
+<td align="right">11</td>
+<td align="left">indeterminate</td>
+</tr>
+<tr class="even">
+<td align="right">12</td>
+<td align="left">water2</td>
+</tr>
+<tr class="odd">
+<td align="right">13</td>
+<td align="left">ditto</td>
+</tr>
+<tr class="even">
+<td align="right">14</td>
+<td align="left">dragon</td>
+</tr>
+<tr class="odd">
+<td align="right">15</td>
+<td align="left">no-eggs</td>
+</tr>
+</tbody>
+</table>
 <h1 id="basic-functionality">Basic Functionality</h1>
 <p>Below we show as basic example of each function.</p>
 <h2 id="encounter-example">Encounter Example</h2>
@@ -605,12 +676,13 @@ body {
 <span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Print results</span></span>
 <span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(dex_example)</span></code></pre></div>
 <pre><code>## # A tibble: 4 x 6
-##   Name      National_Dex_Number Kanto_Dex_Number `Original-johto_Dex_Number` Hoenn_Dex_Number `Original-sinnoh_Dex_Number`
-##   &lt;chr&gt;                   &lt;int&gt;            &lt;int&gt;                       &lt;int&gt;            &lt;int&gt;                        &lt;int&gt;
-## 1 Charizard                   6                6                         231               NA                           NA
-## 2 Beedrill                   15               15                          29               NA                           NA
-## 3 Pidgey                     16               16                          10               NA                           NA
-## 4 Abra                       63               63                          89               39                           20</code></pre>
+##   Name      National_Dex_Number Kanto_Dex_Number `Original-johto_Dex~ Hoenn_Dex_Number
+##   &lt;chr&gt;                   &lt;int&gt;            &lt;int&gt;                &lt;int&gt;            &lt;int&gt;
+## 1 Charizard                   6                6                  231               NA
+## 2 Beedrill                   15               15                   29               NA
+## 3 Pidgey                     16               16                   10               NA
+## 4 Abra                       63               63                   89               39
+## # ... with 1 more variable: Original-sinnoh_Dex_Number &lt;int&gt;</code></pre>
 <h2 id="egg-group-example">Egg Group Example</h2>
 <p>Here we test the <code>egg_group</code> function. We are using all egg groups, and returning the information for the Pokemon in our <code>mons</code> vector that we have been using. Any <code>NA</code> means the Pokemon doesn’t have a second egg group.</p>
 <div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use function on mons vector.</span></span>
