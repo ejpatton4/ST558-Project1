@@ -738,6 +738,35 @@ numbers.
 |       5 | slow-then-very-fast |
 |       6 | fast-then-very-slow |
 
+## Wrapper Function
+
+The final function to show is just a wrapper function called `poke_api`.
+The purpose of this function is to house all the other functions that we
+have shown here. Essentially you can just use `poke_api` to get any of
+the data you would like.
+
+`poke_api` takes one required argument, `func`, that is the name of the
+function you would like to use as a quoted string and then you also pass
+the arguments required for the requested function as well.
+
+If this is confusing an example will be shown later.
+
+``` r
+# Build function
+poke_api <- function(func,...){
+  
+  # Choose which function to use
+  switch(func,
+         "encounter" = encounter(...),
+         "stats"     = stats(...),
+         "size"      = size(...),
+         "dex"       = dex(...),
+         "egg_group" = egg_group(...),
+         "exp_func"  = exp_func(...)
+         )
+} #End function
+```
+
 # Basic Functionality
 
 Below we show a basic example of each function.
@@ -880,3 +909,107 @@ print(exp_example)
     ## 2 Charmander medium slow      560    11735   117360   429235   1059860
     ## 3 Pidgey     medium slow      560    11735   117360   429235   1059860
     ## 4 Abra       medium slow      560    11735   117360   429235   1059860
+
+## Poke API Function Example
+
+Here we test the final function! `poke_api` if you remember this is a
+wrapper function that has all other functions included inside of it. We
+are testing the `encounter` function with our `mons` vector and for only
+the games red and fire red. This is the exact same result as the
+`encounter` example from earlier.
+
+``` r
+# Use function
+poke_api(func = "encounter", poke = mons, game = c("red","firered"))
+```
+
+    ## # A tibble: 91 x 7
+    ##    Name       Location            Game    Chance Max_Level Min_Level Method
+    ##    <chr>      <chr>               <chr>   <chr>  <chr>     <chr>     <chr> 
+    ##  1 Charmander pallet-town-area    red     100    5         5         gift  
+    ##  2 Charmander pallet-town-area    firered 100    5         5         gift  
+    ##  3 Pidgey     kanto-route-12-area red     20     25        25        walk  
+    ##  4 Pidgey     kanto-route-12-area red     15     23        23        walk  
+    ##  5 Pidgey     kanto-route-12-area red     5      27        27        walk  
+    ##  6 Pidgey     kanto-route-12-area firered 10     23        23        walk  
+    ##  7 Pidgey     kanto-route-12-area firered 10     25        25        walk  
+    ##  8 Pidgey     kanto-route-12-area firered 5      27        27        walk  
+    ##  9 Pidgey     kanto-route-12-area firered 4      23        23        walk  
+    ## 10 Pidgey     kanto-route-12-area firered 1      23        23        walk  
+    ## # ... with 81 more rows
+
+# Exploratory Analysis
+
+Now we will begin to use our functions to do some data analysis and
+create some graphs!
+
+## Contingency Tables
+
+The first thing we are going to do is make some contingency tables!
+
+Our first one is a table on the relationship of egg groups to one
+another. Personally I have always been curious about which egg groups
+have the most overlap so lets find out.
+
+``` r
+# Use poke_api to get the data we need and save as object egg_table.
+# We want all Pokemon and egg groups so no need for other arguments.
+egg_table <- poke_api("egg_group")
+
+# Keep only rows needed for table.
+egg_table <- egg_table %>%
+  select(Egg_Group_1,Egg_Group_2)
+
+# Create the contingency table for egg groups and use kable to make it render well.
+kable(table(egg_table))
+```
+
+|               | bug | dragon | fairy | flying | ground | humanshape | indeterminate | mineral | plant | water1 | water2 | water3 |
+|:--------------|----:|-------:|------:|-------:|-------:|-----------:|--------------:|--------:|------:|-------:|-------:|-------:|
+| bug           |   0 |      0 |     2 |      0 |      0 |          2 |             0 |       2 |     2 |      0 |      0 |      4 |
+| ditto         |   0 |      0 |     0 |      0 |      0 |          0 |             0 |       0 |     0 |      0 |      0 |      0 |
+| dragon        |   0 |      0 |     0 |      0 |      0 |          0 |             0 |       0 |     0 |      0 |      0 |      0 |
+| fairy         |   0 |      0 |     0 |      0 |      0 |          0 |             1 |       4 |    11 |      0 |      0 |      0 |
+| flying        |   0 |      2 |     2 |      0 |      3 |          0 |             0 |       0 |     0 |      0 |      0 |      2 |
+| ground        |   0 |      5 |    10 |      0 |      0 |         11 |             0 |       0 |     6 |      0 |      2 |      0 |
+| humanshape    |   0 |      0 |     0 |      0 |      0 |          0 |             0 |       0 |     0 |      0 |      0 |      0 |
+| indeterminate |   0 |      0 |     0 |      0 |      0 |          0 |             0 |       0 |     0 |      0 |      0 |      0 |
+| mineral       |   0 |      0 |     0 |      0 |      0 |          0 |             2 |       0 |     0 |      0 |      0 |      0 |
+| monster       |   0 |     21 |     0 |      0 |     13 |          0 |             0 |       0 |    12 |     13 |      0 |      0 |
+| no-eggs       |   0 |      0 |     0 |      0 |      0 |          0 |             0 |       0 |     0 |      0 |      0 |      0 |
+| plant         |   0 |      0 |     0 |      0 |      0 |          2 |             2 |       2 |     0 |      0 |      0 |      0 |
+| water1        |   4 |     10 |     4 |      4 |     20 |          0 |             3 |       0 |     3 |      0 |      6 |     11 |
+| water2        |   0 |      2 |     0 |      0 |      0 |          0 |             0 |       0 |     0 |      0 |      0 |      0 |
+| water3        |   0 |      0 |     0 |      0 |      0 |          0 |             0 |       0 |     0 |      0 |      0 |      0 |
+
+You can read this as the number being how many Pokemon have both of
+these egg groups. Of note, this is only for Pokemon with two egg groups,
+if they only had one they were excluded.
+
+It looks like the monster and dragon egg groups have the most overlap,
+with 21 Pokemon having both followed closely by 20 from water1 and
+ground. So if you are looking for a Pokemon to breed those two
+combinations are likely a good place to start.
+
+For this next table we are looking at where to find the Pokemon Rattata
+and Pidgey in the Pokemon Red game. Both of these Pokemon can usually be
+found early in the game and are good starting members of your team so
+finding their location could be quite helpful.
+
+``` r
+# Use poke_api to get the data we need and save as pidg_rat_table.
+# We want to see where all you can find these Pokemon in Pokemon Red.
+pidg_rat_table <- poke_api("encounter",poke = c("pidgey","rattata"),game ="red")
+
+# Keep only the columns we need.
+pidg_rat_table <- pidg_rat_table %>%
+  select(Name,Location)
+
+# Create table and use kable to print nicely
+kable(table(pidg_rat_table))
+```
+
+|         | kanto-route-1-area | kanto-route-12-area | kanto-route-13-area | kanto-route-14-area | kanto-route-15-area | kanto-route-16-area | kanto-route-2-south-towards-viridian-city | kanto-route-22-area | kanto-route-24-area | kanto-route-25-area | kanto-route-3-area | kanto-route-4-area | kanto-route-5-area | kanto-route-6-area | kanto-route-7-area | kanto-route-8-area | kanto-route-9-area | kanto-sea-route-21-area |
+|:--------|-------------------:|--------------------:|--------------------:|--------------------:|--------------------:|--------------------:|------------------------------------------:|--------------------:|--------------------:|--------------------:|-------------------:|-------------------:|-------------------:|-------------------:|-------------------:|-------------------:|-------------------:|------------------------:|
+| Pidgey  |                  6 |                   3 |                   2 |                   1 |                   1 |                   0 |                                         3 |                   0 |                   2 |                   1 |                  3 |                  0 |                  3 |                  3 |                  2 |                  2 |                  0 |                       2 |
+| Rattata |                  4 |                   0 |                   0 |                   0 |                   0 |                   3 |                                         4 |                   3 |                   0 |                   0 |                  0 |                  3 |                  0 |                  0 |                  0 |                  0 |                  3 |                       2 |

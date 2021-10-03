@@ -114,4 +114,34 @@ encounter(poke = mons, game = "all")
 
 mons[1]
 
+
+
+
+
+test <- egg_group()
+
+
+
+test <- test %>%
+  select(Egg_Group_1,Egg_Group_2)
+
+table(test)
+
+
+
+
+
+kanto_mons <- poke_api("dex", reg = "kanto")
+
+kanto_mons <- as_vector(kanto_mons$Name)
+
+
+kanto_stats <- poke_api("stats", poke = kanto_mons)
+
+col_names <- names(kanto_stats)
+col_names <- col_names[2:7]
+
+
+hp_sum <- summary(kanto_stats$hp)
+  
          

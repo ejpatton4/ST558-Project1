@@ -783,18 +783,35 @@ body {
 </tr>
 </tbody>
 </table>
+<h2 id="wrapper-function">Wrapper Function</h2>
+<p>The final function to show is just a wrapper function called <code>poke_api</code>. The purpose of this function is to house all the other functions that we have shown here. Essentially you can just use <code>poke_api</code> to get any of the data you would like.</p>
+<p><code>poke_api</code> takes one required argument, <code>func</code>, that is the name of the function you would like to use as a quoted string and then you also pass the arguments required for the requested function as well.</p>
+<p>If this is confusing an example will be shown later.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Build function</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>poke_api <span class="ot">&lt;-</span> <span class="cf">function</span>(func,...){</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Choose which function to use</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">switch</span>(func,</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>         <span class="st">&quot;encounter&quot;</span> <span class="ot">=</span> <span class="fu">encounter</span>(...),</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>         <span class="st">&quot;stats&quot;</span>     <span class="ot">=</span> <span class="fu">stats</span>(...),</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>         <span class="st">&quot;size&quot;</span>      <span class="ot">=</span> <span class="fu">size</span>(...),</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>         <span class="st">&quot;dex&quot;</span>       <span class="ot">=</span> <span class="fu">dex</span>(...),</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>         <span class="st">&quot;egg_group&quot;</span> <span class="ot">=</span> <span class="fu">egg_group</span>(...),</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>         <span class="st">&quot;exp_func&quot;</span>  <span class="ot">=</span> <span class="fu">exp_func</span>(...)</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>         )</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>} <span class="co">#End function</span></span></code></pre></div>
 <h1 id="basic-functionality">Basic Functionality</h1>
 <p>Below we show a basic example of each function.</p>
 <h2 id="encounter-example">Encounter Example</h2>
 <p>Here we test the encounter function with a vector we create called mons that we will use throughout the examples. Also, we are only requesting information of the red and fire red versions of the games.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a vector of four Pokemon</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>mons <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;charmander&quot;</span>,<span class="st">&quot;pidgey&quot;</span>,<span class="st">&quot;abra&quot;</span>,<span class="st">&quot;beedrill&quot;</span>) </span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Use the function and save results in an object</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>enc_example <span class="ot">&lt;-</span> <span class="fu">encounter</span>(<span class="at">poke =</span> mons, <span class="at">game =</span> <span class="fu">c</span>(<span class="st">&quot;red&quot;</span>,<span class="st">&quot;firered&quot;</span>))</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Print the object</span></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(enc_example)</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a vector of four Pokemon</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>mons <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;charmander&quot;</span>,<span class="st">&quot;pidgey&quot;</span>,<span class="st">&quot;abra&quot;</span>,<span class="st">&quot;beedrill&quot;</span>) </span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Use the function and save results in an object</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>enc_example <span class="ot">&lt;-</span> <span class="fu">encounter</span>(<span class="at">poke =</span> mons, <span class="at">game =</span> <span class="fu">c</span>(<span class="st">&quot;red&quot;</span>,<span class="st">&quot;firered&quot;</span>))</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Print the object</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(enc_example)</span></code></pre></div>
 <pre><code>## # A tibble: 91 x 7
 ##    Name       Location            Game    Chance Max_Level Min_Level Method
 ##    &lt;chr&gt;      &lt;chr&gt;               &lt;chr&gt;   &lt;chr&gt;  &lt;chr&gt;     &lt;chr&gt;     &lt;chr&gt; 
@@ -811,11 +828,11 @@ body {
 ## # ... with 81 more rows</code></pre>
 <h2 id="stats-example">Stats Example</h2>
 <p>Here is an example of the <code>stats</code> function, with the mons vector.</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use the function on the vector</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>stat_example <span class="ot">&lt;-</span> <span class="fu">stats</span>(mons)</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Print results</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(stat_example)</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use the function on the vector</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>stat_example <span class="ot">&lt;-</span> <span class="fu">stats</span>(mons)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Print results</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(stat_example)</span></code></pre></div>
 <pre><code>## # A tibble: 4 x 7
 ##   name          hp attack defense `special-attack` `special-defense` speed
 ##   &lt;chr&gt;      &lt;int&gt;  &lt;int&gt;   &lt;int&gt;            &lt;int&gt;             &lt;int&gt; &lt;int&gt;
@@ -825,11 +842,11 @@ body {
 ## 4 Beedrill      65     90      40               45                80    75</code></pre>
 <h2 id="size-example">Size Example</h2>
 <p>Here we test the <code>size</code> function, with the same vector of four Pokemon.</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use the function on the vector</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>size_example <span class="ot">&lt;-</span> <span class="fu">size</span>(mons)</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Print results</span></span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(size_example)</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use the function on the vector</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>size_example <span class="ot">&lt;-</span> <span class="fu">size</span>(mons)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Print results</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(size_example)</span></code></pre></div>
 <pre><code>## # A tibble: 4 x 3
 ##   Name       Height_Meters Weight_Kilograms
 ##   &lt;chr&gt;              &lt;dbl&gt;            &lt;dbl&gt;
@@ -839,11 +856,11 @@ body {
 ## 4 Beedrill             1               29.5</code></pre>
 <h2 id="dex-example">Dex Example</h2>
 <p>Here we test the <code>dex</code> function. We are using regions with dex ids 1 through 5, and only returning results on our same four Pokemon. Any <code>NA</code> means that the Pokemon is not in that Pokedex.</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use function on vectors</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>dex_example <span class="ot">&lt;-</span> <span class="fu">dex</span>(<span class="at">reg =</span> <span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>), <span class="at">poke =</span> mons)</span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Print results</span></span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(dex_example)</span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use function on vectors</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>dex_example <span class="ot">&lt;-</span> <span class="fu">dex</span>(<span class="at">reg =</span> <span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>), <span class="at">poke =</span> mons)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Print results</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(dex_example)</span></code></pre></div>
 <pre><code>## # A tibble: 4 x 6
 ##   Name       National_Dex_Number Kanto_Dex_Number `Original-johto_Dex_Number` Hoenn_Dex_Number `Original-sinnoh_Dex_Number`
 ##   &lt;chr&gt;                    &lt;int&gt;            &lt;int&gt;                       &lt;int&gt;            &lt;int&gt;                        &lt;int&gt;
@@ -853,11 +870,11 @@ body {
 ## 4 Abra                        63               63                          89               39                           20</code></pre>
 <h2 id="egg-group-example">Egg Group Example</h2>
 <p>Here we test the <code>egg_group</code> function. We are using all egg groups, and returning the information for the Pokemon in our <code>mons</code> vector that we have been using. Any <code>NA</code> means the Pokemon doesn’t have a second egg group.</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use function on mons vector.</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>egg_example <span class="ot">&lt;-</span> <span class="fu">egg_group</span>(<span class="at">group =</span> <span class="st">&quot;all&quot;</span>, <span class="at">poke =</span> mons)</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Return the tibble.</span></span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(egg_example)</span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use function on mons vector.</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>egg_example <span class="ot">&lt;-</span> <span class="fu">egg_group</span>(<span class="at">group =</span> <span class="st">&quot;all&quot;</span>, <span class="at">poke =</span> mons)</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Return the tibble.</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(egg_example)</span></code></pre></div>
 <pre><code>## # A tibble: 4 x 3
 ##   Name       Egg_Group_1 Egg_Group_2
 ##   &lt;chr&gt;      &lt;chr&gt;       &lt;chr&gt;      
@@ -867,11 +884,11 @@ body {
 ## 4 Abra       humanshape  &lt;NA&gt;</code></pre>
 <h2 id="experience-function-example">Experience Function Example</h2>
 <p>Here we test the <code>exp_func</code> function. We are using all rate groups, the same <code>mons</code> vector we have been using, and levels 10, 25, 50, 75, and 100.</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use function on mons vector and for the specific levels we want.</span></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>exp_example <span class="ot">&lt;-</span> <span class="fu">exp_func</span>(<span class="at">rate =</span> <span class="st">&quot;all&quot;</span>, <span class="at">poke =</span> mons, <span class="at">level =</span> <span class="fu">c</span>(<span class="dv">10</span>,<span class="dv">25</span>,<span class="dv">50</span>,<span class="dv">75</span>,<span class="dv">100</span>))</span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Return the tibble.</span></span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(exp_example)</span></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use function on mons vector and for the specific levels we want.</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>exp_example <span class="ot">&lt;-</span> <span class="fu">exp_func</span>(<span class="at">rate =</span> <span class="st">&quot;all&quot;</span>, <span class="at">poke =</span> mons, <span class="at">level =</span> <span class="fu">c</span>(<span class="dv">10</span>,<span class="dv">25</span>,<span class="dv">50</span>,<span class="dv">75</span>,<span class="dv">100</span>))</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Return the tibble.</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(exp_example)</span></code></pre></div>
 <pre><code>## # A tibble: 4 x 7
 ##   Name       Description Level_10 Level_25 Level_50 Level_75 Level_100
 ##   &lt;chr&gt;      &lt;chr&gt;          &lt;int&gt;    &lt;int&gt;    &lt;int&gt;    &lt;int&gt;     &lt;int&gt;
@@ -879,6 +896,367 @@ body {
 ## 2 Charmander medium slow      560    11735   117360   429235   1059860
 ## 3 Pidgey     medium slow      560    11735   117360   429235   1059860
 ## 4 Abra       medium slow      560    11735   117360   429235   1059860</code></pre>
+<h2 id="poke-api-function-example">Poke API Function Example</h2>
+<p>Here we test the final function! <code>poke_api</code> if you remember this is a wrapper function that has all other functions included inside of it. We are testing the <code>encounter</code> function with our <code>mons</code> vector and for only the games red and fire red. This is the exact same result as the <code>encounter</code> example from earlier.</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use function</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="fu">poke_api</span>(<span class="at">func =</span> <span class="st">&quot;encounter&quot;</span>, <span class="at">poke =</span> mons, <span class="at">game =</span> <span class="fu">c</span>(<span class="st">&quot;red&quot;</span>,<span class="st">&quot;firered&quot;</span>))</span></code></pre></div>
+<pre><code>## # A tibble: 91 x 7
+##    Name       Location            Game    Chance Max_Level Min_Level Method
+##    &lt;chr&gt;      &lt;chr&gt;               &lt;chr&gt;   &lt;chr&gt;  &lt;chr&gt;     &lt;chr&gt;     &lt;chr&gt; 
+##  1 Charmander pallet-town-area    red     100    5         5         gift  
+##  2 Charmander pallet-town-area    firered 100    5         5         gift  
+##  3 Pidgey     kanto-route-12-area red     20     25        25        walk  
+##  4 Pidgey     kanto-route-12-area red     15     23        23        walk  
+##  5 Pidgey     kanto-route-12-area red     5      27        27        walk  
+##  6 Pidgey     kanto-route-12-area firered 10     23        23        walk  
+##  7 Pidgey     kanto-route-12-area firered 10     25        25        walk  
+##  8 Pidgey     kanto-route-12-area firered 5      27        27        walk  
+##  9 Pidgey     kanto-route-12-area firered 4      23        23        walk  
+## 10 Pidgey     kanto-route-12-area firered 1      23        23        walk  
+## # ... with 81 more rows</code></pre>
+<h1 id="exploratory-analysis">Exploratory Analysis</h1>
+<p>Now we will begin to use our functions to do some data analysis and create some graphs!</p>
+<h2 id="contingency-tables">Contingency Tables</h2>
+<p>The first thing we are going to do is make some contingency tables!</p>
+<p>Our first one is a table on the relationship of egg groups to one another. Personally I have always been curious about which egg groups have the most overlap so lets find out.</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use poke_api to get the data we need and save as object egg_table.</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="co"># We want all Pokemon and egg groups so no need for other arguments.</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>egg_table <span class="ot">&lt;-</span> <span class="fu">poke_api</span>(<span class="st">&quot;egg_group&quot;</span>)</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Keep only rows needed for table.</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>egg_table <span class="ot">&lt;-</span> egg_table <span class="sc">%&gt;%</span></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Egg_Group_1,Egg_Group_2)</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Create the contingency table for egg groups and use kable to make it render well.</span></span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(<span class="fu">table</span>(egg_table))</span></code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="right">bug</th>
+<th align="right">dragon</th>
+<th align="right">fairy</th>
+<th align="right">flying</th>
+<th align="right">ground</th>
+<th align="right">humanshape</th>
+<th align="right">indeterminate</th>
+<th align="right">mineral</th>
+<th align="right">plant</th>
+<th align="right">water1</th>
+<th align="right">water2</th>
+<th align="right">water3</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">bug</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">2</td>
+<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">4</td>
+</tr>
+<tr class="even">
+<td align="left">ditto</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">dragon</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">fairy</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">4</td>
+<td align="right">11</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">flying</td>
+<td align="right">0</td>
+<td align="right">2</td>
+<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">3</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">2</td>
+</tr>
+<tr class="even">
+<td align="left">ground</td>
+<td align="right">0</td>
+<td align="right">5</td>
+<td align="right">10</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">11</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">6</td>
+<td align="right">0</td>
+<td align="right">2</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">humanshape</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">indeterminate</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">mineral</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">monster</td>
+<td align="right">0</td>
+<td align="right">21</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">13</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">12</td>
+<td align="right">13</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">no-eggs</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">plant</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">2</td>
+<td align="right">2</td>
+<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">water1</td>
+<td align="right">4</td>
+<td align="right">10</td>
+<td align="right">4</td>
+<td align="right">4</td>
+<td align="right">20</td>
+<td align="right">0</td>
+<td align="right">3</td>
+<td align="right">0</td>
+<td align="right">3</td>
+<td align="right">0</td>
+<td align="right">6</td>
+<td align="right">11</td>
+</tr>
+<tr class="even">
+<td align="left">water2</td>
+<td align="right">0</td>
+<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">water3</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+</tbody>
+</table>
+<p>You can read this as the number being how many Pokemon have both of these egg groups. Of note, this is only for Pokemon with two egg groups, if they only had one they were excluded.</p>
+<p>It looks like the monster and dragon egg groups have the most overlap, with 21 Pokemon having both followed closely by 20 from water1 and ground. So if you are looking for a Pokemon to breed those two combinations are likely a good place to start.</p>
+<p>For this next table we are looking at where to find the Pokemon Rattata and Pidgey in the Pokemon Red game. Both of these Pokemon can usually be found early in the game and are good starting members of your team so finding their location could be quite helpful.</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use poke_api to get the data we need and save as pidg_rat_table.</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="co"># We want to see where all you can find these Pokemon in Pokemon Red.</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>pidg_rat_table <span class="ot">&lt;-</span> <span class="fu">poke_api</span>(<span class="st">&quot;encounter&quot;</span>,<span class="at">poke =</span> <span class="fu">c</span>(<span class="st">&quot;pidgey&quot;</span>,<span class="st">&quot;rattata&quot;</span>),<span class="at">game =</span><span class="st">&quot;red&quot;</span>)</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Keep only the columns we need.</span></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>pidg_rat_table <span class="ot">&lt;-</span> pidg_rat_table <span class="sc">%&gt;%</span></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Name,Location)</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Create table and use kable to print nicely</span></span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(<span class="fu">table</span>(pidg_rat_table))</span></code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="right">kanto-route-1-area</th>
+<th align="right">kanto-route-12-area</th>
+<th align="right">kanto-route-13-area</th>
+<th align="right">kanto-route-14-area</th>
+<th align="right">kanto-route-15-area</th>
+<th align="right">kanto-route-16-area</th>
+<th align="right">kanto-route-2-south-towards-viridian-city</th>
+<th align="right">kanto-route-22-area</th>
+<th align="right">kanto-route-24-area</th>
+<th align="right">kanto-route-25-area</th>
+<th align="right">kanto-route-3-area</th>
+<th align="right">kanto-route-4-area</th>
+<th align="right">kanto-route-5-area</th>
+<th align="right">kanto-route-6-area</th>
+<th align="right">kanto-route-7-area</th>
+<th align="right">kanto-route-8-area</th>
+<th align="right">kanto-route-9-area</th>
+<th align="right">kanto-sea-route-21-area</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Pidgey</td>
+<td align="right">6</td>
+<td align="right">3</td>
+<td align="right">2</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">3</td>
+<td align="right">0</td>
+<td align="right">2</td>
+<td align="right">1</td>
+<td align="right">3</td>
+<td align="right">0</td>
+<td align="right">3</td>
+<td align="right">3</td>
+<td align="right">2</td>
+<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">2</td>
+</tr>
+<tr class="even">
+<td align="left">Rattata</td>
+<td align="right">4</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">3</td>
+<td align="right">4</td>
+<td align="right">3</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">3</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">3</td>
+<td align="right">2</td>
+</tr>
+</tbody>
+</table>
 
 </body>
 </html>

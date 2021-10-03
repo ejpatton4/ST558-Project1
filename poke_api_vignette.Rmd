@@ -177,12 +177,13 @@ You can read about what each one means by clicking on their names as they are li
 
 The `stats` function  is built below and it will return this information about the Pokemon the user chooses. The function takes a single argument which is `poke` this can be a either a single character string or a vector of them if you want to return the details about more Pokemon.
 
-
-
 ```{r stats_function}
 
 # Create the function
 stats <- function(poke) {
+  
+  # change poke to lower case for flexibility.
+  poke <- tolower(poke)
   
   # Looping for entrance of a vector
   for(i in 1:length(poke)){
@@ -730,6 +731,32 @@ kable(exp_df2)
 ```
 
 
+## Wrapper Function
+
+The final function to show is just a wrapper function called `poke_api`. The purpose of this function is to house all the other functions that we have shown here. Essentially you can just use `poke_api` to get any of the data you would like.
+
+`poke_api` takes one required argument, `func`, that is the name of the function you would like to use as a quoted string and then you also pass the arguments required for the requested function as well.
+
+If this is confusing an example will be shown later.
+
+```{r poke_api}
+
+# Build function
+poke_api <- function(func,...){
+  
+  # Choose which function to use
+  switch(func,
+         "encounter" = encounter(...),
+         "stats"     = stats(...),
+         "size"      = size(...),
+         "dex"       = dex(...),
+         "egg_group" = egg_group(...),
+         "exp_func"  = exp_func(...)
+         )
+} #End function
+```
+
+
 
 
 
@@ -818,4 +845,100 @@ print(exp_example)
 ```
 
 
+## Poke API Function Example
+
+Here we test the final function! `poke_api` if you remember this is a wrapper function that has all other functions included inside of it. We are testing the `encounter` function with our `mons` vector and for only the games red and fire red. This is the exact same result as the `encounter` example from earlier.
+```{r poke api example}
+# Use function
+poke_api(func = "encounter", poke = mons, game = c("red","firered"))
+```
+
+
+
+# Exploratory Analysis
+
+Now we will begin to use our functions to do some data analysis and create some graphs!
+
+## Contingency Tables
+
+The first thing we are going to do is make some contingency tables! 
+
+Our first one is a table on the relationship of egg groups to one another. Personally I have always been curious about which egg groups have the most overlap so lets find out. 
+
+
+
+```{r cont table 1}
+# Use poke_api to get the data we need and save as object egg_table.
+# We want all Pokemon and egg groups so no need for other arguments.
+egg_table <- poke_api("egg_group")
+
+# Keep only rows needed for table.
+egg_table <- egg_table %>%
+  select(Egg_Group_1,Egg_Group_2)
+
+# Create the contingency table for egg groups and use kable to make it render well.
+kable(table(egg_table))
+```
+
+
+You can read this as the number being how many Pokemon have both of these egg groups. Of note, this is only for Pokemon with two egg groups, if they only had one they were excluded.
+
+It looks like the monster and dragon egg groups have the most overlap, with 21 Pokemon having both followed closely by 20 from water1 and ground. So if you are looking for a Pokemon to breed those two combinations are likely a good place to start.
+
+
+For this next table we are looking at where to find the Pokemon Rattata and Pidgey in the Pokemon Red game. Both of these Pokemon can usually be found early in the game and are good starting members of your team so finding their location could be quite helpful.
+
+```{r cont table 2}
+
+# Use poke_api to get the data we need and save as pidg_rat_table.
+# We want to see where all you can find these Pokemon in Pokemon Red.
+pidg_rat_table <- poke_api("encounter",poke = c("pidgey","rattata"),game ="red")
+
+# Keep only the columns we need.
+pidg_rat_table <- pidg_rat_table %>%
+  select(Name,Location)
+
+# Create table and use kable to print nicely.
+kable(table(pidg_rat_table))
+```
+
+
+As you can see from the table, if you are looking to catch both of these Pokemon, the Kanto Route 1 Area looks like a great place to start.
+
+For this next contingency table we want to look at what games to find some Pokemon in. For this I have chosen Charmander, Lapras, MewTwo, Hitmonchan, and Pansear as they are some of my favorites.
+
+```{r cont table 3}
+
+# Use poke_api to get the data, save as object game_table
+game_table <- poke_api("encounter",poke = c("Charmander","lapras","mewtwo","hitmonchan","pansear"))
+
+# Only keep needed columns.
+game_table <- game_table %>%
+  select(Name, Game)
+
+# Create table and use kable.
+kable(table(game_table))
+```
+
+
+
+From the table it appears the Fire Red and Leaf Green games would be a great place to start. Except for Pansear, if I wanted to find that Pokemon, the Black and White versions of the game look like the winner.
+
+## Numerical Summaries
+
+Next I want to look into the base stats from each Pokemon in the Kanto region. First we have to get a list of all Pokemon in the Kanto region if only there was someway to do that, OH WAIT, the `dex` function will do that for us. After we get this list we can  use it in the `stats` function to retrieve all of their base stats.
+
+After getting all of their base stats we can create five number summaries for each stat.
+
+```{r num sum one}
+# First get a list of all Pokemon in the Kanto region.
+kanto_mons <- poke_api("dex", reg = "kanto")
+
+# Get the stats for the Kanto region Pokemon
+kanto_stats <- poke_api("stats", poke = kanto_mons$Name)
+
+# Create five number summary for each of the base stats.
+
+# summary()
+```
 
