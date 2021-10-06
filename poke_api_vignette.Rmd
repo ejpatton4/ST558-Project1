@@ -1,8 +1,4 @@
----
-title: "Poke API Vignette"
-author: "Evan Patton"
-date: "9/27/2021"
----
+
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(eval = TRUE, echo = TRUE, message = FALSE, warning = FALSE)
@@ -11,7 +7,7 @@ knitr::opts_chunk$set(eval = TRUE, echo = TRUE, message = FALSE, warning = FALSE
 
 # Introduction
 
-This space reserved for introduction, talk about the project, my thoughts, and then an overview of my work.
+Below you will find my Poke API Vignette. There are eight functions available for use, one of which is a wrapper function to house the other seven. You can use the functions for querying data from the [Poke API website](https://pokeapi.co/). After showing how all the functions are built I do a simple example of each. Finally I do some data analysis using my created functions to show the type of analysis that can be conducted with these functions and the data they provide access to. Throughout this process, [Bulbapedia](https://bulbapedia.bulbagarden.net/wiki/Main_Page) has been an invaluable resource and will no doubt help someone trying to use these functions. Thank you for reading and I hope you find this vignette and these functions useful for your analysis!
 
 
 
@@ -60,84 +56,84 @@ encounter <- function(poke, game = "all") {
   # Start all loops.
   # Start loop for specific pokemon.
   for(c in 1:length(poke)){
-  
-  # Get the requested data   
-  raw_data <- fromJSON(paste0("https://pokeapi.co/api/v2/pokemon/",poke[c],"/encounters"), flatten = TRUE)
-  
-  
-  # Beginning of location loop.
-  for (i in 1:dim(raw_data)[1]) {
     
-    # Get the location from raw.
-    loc <- raw_data[i,2]
+    # Get the requested data   
+    raw_data <- fromJSON(paste0("https://pokeapi.co/api/v2/pokemon/",poke[c],"/encounters"), flatten = TRUE)
     
-    # Beginning of game loop.
-    for (b in 1:dim(raw_data[[1]][[i]])[1]){
+    
+    # Beginning of location loop.
+    for (i in 1:dim(raw_data)[1]) {
       
-      # Get the specific game from raw.
-      gm <- raw_data[[1]][[i]][b,3]
+      # Get the location from raw.
+      loc <- raw_data[i,2]
       
-      # Beginning of details loop.
-      for (a in 1:dim(raw_data[[1]][[i]][[1]][[b]])[1]){
+      # Beginning of game loop.
+      for (b in 1:dim(raw_data[[1]][[i]])[1]){
         
-        # Get the name, chance, max level, min level, and method.
-        Name   <- poke[c]
-        chance <- raw_data[[1]][[i]][[1]][[b]][a,1]
-        max    <- raw_data[[1]][[i]][[1]][[b]][a,3]
-        min    <- raw_data[[1]][[i]][[1]][[b]][a,4]
-        meth   <- raw_data[[1]][[i]][[1]][[b]][a,5]
+        # Get the specific game from raw.
+        gm <- raw_data[[1]][[i]][b,3]
         
-        # Combine all vars into a line for tibble creation
-        line   <- c(Name,loc,gm,chance,max,min,meth)
+        # Beginning of details loop.
+        for (a in 1:dim(raw_data[[1]][[i]][[1]][[b]])[1]){
+          
+          # Get the name, chance, max level, min level, and method.
+          Name   <- poke[c]
+          chance <- raw_data[[1]][[i]][[1]][[b]][a,1]
+          max    <- raw_data[[1]][[i]][[1]][[b]][a,3]
+          min    <- raw_data[[1]][[i]][[1]][[b]][a,4]
+          meth   <- raw_data[[1]][[i]][[1]][[b]][a,5]
+          
+          # Combine all vars into a line for tibble creation
+          line   <- c(Name,loc,gm,chance,max,min,meth)
+          
+          # Build dfd tibble.
+          # If this is the first iteration of the details loop
+          # then dfd is created with all of the vars.
+          # If not first iteration, bind dfd with line to add another line to dfd.
+          if(a == 1){
+            dfd <- tibble(Name,loc,gm,chance,max,min,meth)
+          } else{
+            dfd <- rbind(dfd,line)
+          } # Close if else statement.
+        } # Close details loop.
         
-        # Build dfd tibble.
-        # If this is the first iteration of the details loop
-        # then dfd is created with all of the vars.
-        # If not first iteration, bind dfd with line to add another line to dfd.
-        if(a == 1){
-          dfd <- tibble(Name,loc,gm,chance,max,min,meth)
-        } else{
-          dfd <- rbind(dfd,line)
-        } # Close if else statement.
-      } # Close details loop.
+        # Build dfg tibble.
+        # If first iteration of game loop, dfg is dfd.
+        # If not first iteration, dfg is binded with dfd to add more lines.
+        if(b == 1)
+        {dfg <- dfd
+        }else{
+          dfg <- rbind(dfg,dfd)
+        } # Close if else statement
+      } # Close game loop
       
-      # Build dfg tibble.
-      # If first iteration of game loop, dfg is dfd.
-      # If not first iteration, dfg is binded with dfd to add more lines.
-      if(b == 1)
-      {dfg <- dfd
+      # Create final tibble
+      # If first iteration of location loop, dfl is the final dfg from the game loop.
+      # If not first iteration, dfl is binded with the most recent dfg to add more lines.
+      if(i==1){
+        dfl <- dfg
       }else{
-        dfg <- rbind(dfg,dfd)
-      } # Close if else statement
-    } # Close game loop
+        dfl <- rbind(dfl,dfg)
+      } # End if else statement
+    } # End location loop
+    # End of all loops
     
-    # Create final tibble
-    # If first iteration of location loop, dfl is the final dfg from the game loop.
-    # If not first iteration, dfl is binded with the most recent dfg to add more lines.
-    if(i==1){
-      dfl <- dfg
+    # Rename variables in final dfl.
+    names(dfl) <- c("Name","Location","Game","Chance","Max_Level","Min_Level","Method")
+    
+    # Keep only distinct rows, as there are some that repeat due to variables 
+    # not important for this function.
+    dfl <- distinct(dfl)
+    
+    
+    # If first iteration of main loop, final tibble is dfl tibble.
+    # If not first iteration, final tibble is binded with df1 tibble
+    if(c == 1){
+      final <- dfl
     }else{
-      dfl <- rbind(dfl,dfg)
+      final <- rbind(final,dfl)
     } # End if else statement
-  } # End location loop
-  # End of all loops
-  
-  # Rename variables in final dfl.
-  names(dfl) <- c("Name","Location","Game","Chance","Max_Level","Min_Level","Method")
-  
-  # Keep only distinct rows, as there are some that repeat due to variables 
-  # not important for this function.
-  dfl <- distinct(dfl)
-  
-
-  # If first iteration of main loop, final tibble is dfl tibble.
-  # If not first iteration, final tibble is binded with df1 tibble
-  if(c == 1){
-    final <- dfl
-  }else{
-    final <- rbind(final,dfl)
-  } # End if else statement
-  
+    
   } # End main loop
   
   # If user wants all games returned, no change to final tibble.
@@ -154,7 +150,7 @@ encounter <- function(poke, game = "all") {
   
   # Return final tibble.
   return(final)
-  } # End function.
+} # End function.
 
 ```
 
@@ -187,32 +183,32 @@ stats <- function(poke) {
   
   # Looping for entrance of a vector
   for(i in 1:length(poke)){
-  
+    
     # Get requested data from API
-  raw_data <- fromJSON(paste0("https://pokeapi.co/api/v2/pokemon/",poke[i]), flatten = TRUE)
-
-  # Select only the information about the base stats
-  df <- as_tibble(raw_data[["stats"]])
-  
-  # Add a column for the name of the Pokemon 
-  df$name <- str_to_sentence(poke[i])
-  
-  # Keep only needed columns and reorder
-  df <- df[,c(5,1,3)]
-  
-  # Pivot from long form to a single row
-  df <- df %>%
-    pivot_wider(names_from = stat.name, values_from = base_stat)
-  
-
-  # If first iteration of loop, the final tibble  is created
-  # If not the first iteration bind the final tibble from the previous loops 
-  # with the new information
-if( i == 1){
-  final <- df
-}else{
-  final <- rbind(final,df)
-} # End if else statement
+    raw_data <- fromJSON(paste0("https://pokeapi.co/api/v2/pokemon/",poke[i]), flatten = TRUE)
+    
+    # Select only the information about the base stats
+    df <- as_tibble(raw_data[["stats"]])
+    
+    # Add a column for the name of the Pokemon 
+    df$Name <- str_to_sentence(raw_data[["name"]])
+    
+    # Keep only needed columns and reorder
+    df <- df[,c(5,1,3)]
+    
+    # Pivot from long form to a single row
+    df <- df %>%
+      pivot_wider(names_from = stat.name, values_from = base_stat)
+    
+    
+    # If first iteration of loop, the final tibble  is created
+    # If not the first iteration bind the final tibble from the previous loops 
+    # with the new information
+    if( i == 1){
+      final <- df
+    }else{
+      final <- rbind(final,df)
+    } # End if else statement
   }# End loop
   
   # Return the final tibble.
@@ -231,28 +227,31 @@ The output of the `size` function is a tibble with the Pokemons name, Height in 
 # Create function.
 size <- function(poke) {
   
+  # Change poke to lower case for flexibility.
+  poke <- tolower(poke)
+  
   # Start loop if there is more than one Pokemon inputted.
   for(i in 1:length(poke)){
-  
-  # Get requested data from API.
-  raw_data <- fromJSON(paste0("https://pokeapi.co/api/v2/pokemon/",poke[i]), flatten = TRUE)
-  
-  # Create objects to hold the height weight and name. 
-  ht <- raw_data[["height"]]
-  wt <- raw_data[["weight"]]
-  Name <- str_to_sentence(poke[i])
-  
-  # Turn the objects into a tibble. 
-  df <- tibble(Name,ht,wt)
-  
-  # If first iteration of loop, the final tibble  is created
-  # If not the first iteration bind the final tibble from the previous loops 
-  # with the new information
-if( i == 1){
-  final <- df
-}else{
-  final <- rbind(final,df)
-} # End if else statement
+    
+    # Get requested data from API.
+    raw_data <- fromJSON(paste0("https://pokeapi.co/api/v2/pokemon/",poke[i]), flatten = TRUE)
+    
+    # Create objects to hold the height weight and name. 
+    ht <- raw_data[["height"]]
+    wt <- raw_data[["weight"]]
+    Name <- str_to_sentence(raw_data[["name"]])
+    
+    # Turn the objects into a tibble. 
+    df <- tibble(Name,ht,wt)
+    
+    # If first iteration of loop, the final tibble  is created
+    # If not the first iteration bind the final tibble from the previous loops 
+    # with the new information
+    if( i == 1){
+      final <- df
+    }else{
+      final <- rbind(final,df)
+    } # End if else statement
   } # End loop
   
   # Edit the tibble before returning.
@@ -263,8 +262,8 @@ if( i == 1){
     mutate(Height_Meters = ht / 10,
            Weight_Kilograms = wt / 10) %>%
     select(Name,Height_Meters,Weight_Kilograms)
-    
-   # Return the tibble.
+  
+  # Return the tibble.
   return(final)
 } # End of function
 ```
@@ -369,25 +368,25 @@ get_all_ids <- function(x){
   for(i in 1:length(x)){
     
     # Get data from API
-  raw_data <- fromJSON(paste0("https://pokeapi.co/api/v2/pokedex/",x[i]))
-  
-  # Save region ID number
-  region_id <- raw_data[["id"]]
-  
-  # Save region name 
-  region_name <- raw_data[["name"]]
-  
-  # Create tibble from name and id
-  df <- tibble(region_id,region_name)
-  
-  # If first iteration of loop, final is the df tibble.
-  # If not first iteration of loop, final is binded with df to add new data.
-  if(i == 1){
-    final <- df
-  }else{
-    final <- rbind(final,df)
-  } # End if else statement
-  
+    raw_data <- fromJSON(paste0("https://pokeapi.co/api/v2/pokedex/",x[i]))
+    
+    # Save region ID number
+    region_id <- raw_data[["id"]]
+    
+    # Save region name 
+    region_name <- raw_data[["name"]]
+    
+    # Create tibble from name and id
+    df <- tibble(region_id,region_name)
+    
+    # If first iteration of loop, final is the df tibble.
+    # If not first iteration of loop, final is binded with df to add new data.
+    if(i == 1){
+      final <- df
+    }else{
+      final <- rbind(final,df)
+    } # End if else statement
+    
   } # End loop
   # Return final tibble
   return(final)
@@ -420,7 +419,7 @@ Every Pokemon belongs to at least one egg group even if that group is "no eggs".
 
 # Build function
 egg_group <- function(group = "all", poke = "all"){
-
+  
   # Change inputs to lower to case to allow for some flexibility.
   group <- tolower(group)
   poke  <- tolower(poke)
@@ -434,90 +433,90 @@ egg_group <- function(group = "all", poke = "all"){
   } # End if else statement
   
   # Begin loop for specific egg group.
-for(i in 1:length(group)) {
-  
-  # Get the data we need from API.
-raw_data <- fromJSON(paste0("https://pokeapi.co/api/v2/egg-group/",group[i]))
-
-  # Save the name of the egg group as grp.
-grp <- raw_data$name
-
-   # Begin loop for Pokemon inside of egg group.
-   for(a in 1:dim(raw_data$pokemon_species)[1]){
-     
-     # Save the name of the Pokemon as name.
-     name <- raw_data$pokemon_species[a,1]
-     
-     # Create tibble with the name of the Pokemon and egg group.
-     row_info <- tibble(name,grp)
-     
-     # If first iteration of Pokemon loop, the df tibble is defined as the row_info tibble.
-     # If not first iteration, the df binded with row_info to add more inforamtion.
-     if(a == 1){
-       df <- row_info
-     } else{
-       df <- rbind(df,row_info)
-     } # End of if else statement
-   } # End of Pokemon for loop
-
+  for(i in 1:length(group)) {
+    
+    # Get the data we need from API.
+    raw_data <- fromJSON(paste0("https://pokeapi.co/api/v2/egg-group/",group[i]))
+    
+    # Save the name of the egg group as grp.
+    grp <- raw_data$name
+    
+    # Begin loop for Pokemon inside of egg group.
+    for(a in 1:dim(raw_data$pokemon_species)[1]){
+      
+      # Save the name of the Pokemon as name.
+      name <- raw_data$pokemon_species[a,1]
+      
+      # Create tibble with the name of the Pokemon and egg group.
+      row_info <- tibble(name,grp)
+      
+      # If first iteration of Pokemon loop, the df tibble is defined as the row_info tibble.
+      # If not first iteration, the df binded with row_info to add more inforamtion.
+      if(a == 1){
+        df <- row_info
+      } else{
+        df <- rbind(df,row_info)
+      } # End of if else statement
+    } # End of Pokemon for loop
+    
     # Changing the names of the columns for easy joining.
     # The new column of egg groups is called _iteration with the iteration of the
     # egg group loop included before the _, this is to not overwrite previous data collected.
     names(df) <- c("name",paste0(i,"_iteration"))
-
-     # If first iteration of egg group loop, the df2 tibble is defined as the most recent df tibble.
-     # If not first iteration, the df2 tibble is full joined with df to add new data.
- if(i == 1){
-  df2 <- df
- }else{
-  df2 <- full_join(df2,df, by = c("name"= "name")) 
- } # End of if else statement.
-} # End of egg group loop.
+    
+    # If first iteration of egg group loop, the df2 tibble is defined as the most recent df tibble.
+    # If not first iteration, the df2 tibble is full joined with df to add new data.
+    if(i == 1){
+      df2 <- df
+    }else{
+      df2 <- full_join(df2,df, by = c("name"= "name")) 
+    } # End of if else statement.
+  } # End of egg group loop.
   
   # After the egg group loop is completed we are left with a tibble that is not
   # very descriptive and contains a lot of NAs. This section below helps to clean 
   # data for return.
   
   # Begin cleaning loop.
-    for(b in 1:dim(df2)[1]){
-      
-      # Find columns for row b that are not NA and return a vector of 1s and 0s.
-      row_na_info <- as.numeric(!is.na(df2[b,]))
-      
-      # This finds what position in the df2 tibble was not NA.
-      not_na <- which(row_na_info %in% 1)
-      
-      # The first non NA is always the name, this is save as nm.
-      nm <- df2[b,not_na[1]]
-      
-      # The second non NA is the first egg group for a Pokemon.
-      # This is saved as group1.
-      group1 <- df2[b,not_na[2]]
-      
-      # Not all Pokemon have two egg groups this if else statement accounts for that.
-      # If there are three columns of non NA, group2 is defined as the second egg group.
-      # If there are not three NA free columns, group2 is defined as NA.
-      if(length(not_na) == 3){
-        group2 <- df2[b,not_na[3]]
-      }else{
-        group2 <- NA
-      } # End of if else statement.
-      
-      # Create new_row tibble, with cleaned name and egg group(s).
-      new_row <- tibble(nm,group1,group2)
-      
-      # Rename columns
-      names(new_row) <- c("Name","Egg_Group_1","Egg_Group_2")
-      
-      # If first iteration of cleaning loop, df3 is defined as the new_row tibble.
-      # If not first iteration df3 is binded with new_row to add new data.
-      if(b == 1){
+  for(b in 1:dim(df2)[1]){
+    
+    # Find columns for row b that are not NA and return a vector of 1s and 0s.
+    row_na_info <- as.numeric(!is.na(df2[b,]))
+    
+    # This finds what position in the df2 tibble was not NA.
+    not_na <- which(row_na_info %in% 1)
+    
+    # The first non NA is always the name, this is save as nm.
+    nm <- df2[b,not_na[1]]
+    
+    # The second non NA is the first egg group for a Pokemon.
+    # This is saved as group1.
+    group1 <- df2[b,not_na[2]]
+    
+    # Not all Pokemon have two egg groups this if else statement accounts for that.
+    # If there are three columns of non NA, group2 is defined as the second egg group.
+    # If there are not three NA free columns, group2 is defined as NA.
+    if(length(not_na) == 3){
+      group2 <- df2[b,not_na[3]]
+    }else{
+      group2 <- NA
+    } # End of if else statement.
+    
+    # Create new_row tibble, with cleaned name and egg group(s).
+    new_row <- tibble(nm,group1,group2)
+    
+    # Rename columns
+    names(new_row) <- c("Name","Egg_Group_1","Egg_Group_2")
+    
+    # If first iteration of cleaning loop, df3 is defined as the new_row tibble.
+    # If not first iteration df3 is binded with new_row to add new data.
+    if(b == 1){
       df3 <- new_row
-      }else{
+    }else{
       df3 <- rbind(df3,new_row)
     } # End of if else statement.
-} # End of cleaning loop
-
+  } # End of cleaning loop
+  
   # If user didn't specify Pokemon to return, the final tibble is defined as the most recent df3.
   # If user did specify df3 is filtered for the Pokemon and saved as the final tibble.
   if("all" %in% poke){
@@ -564,8 +563,8 @@ get_group_ids <- function(x){
     }else{
       final_tibble <- rbind(final_tibble,group_row_info)
     } # End if else statement
-} # End of loop
-
+  } # End of loop
+  
   # Return tibble
   return(final_tibble)
 } # End Function
@@ -596,106 +595,106 @@ Every Pokemon has a certain formula that defines how much experience it takes to
 ```{r exp_func}
 # Define function.
 exp_func <- function(rate = "all",poke = "all",level = "all"){
-
+  
   # Change inputs to lower case for variability in inputs.
-rate <- tolower(rate)
-poke <- tolower(poke)
-level <- tolower(level) 
-
-# Create empty object to be used later as the col names for the tibble.
-level_vec <- as.character()
-
-# If all rate are requested, rate is 1 through 6, if not rate is what was inputted.
-if("all" %in% rate){
-  rate <- c(1:6)
-}else{
-  rate <- rate
-} # End if else statement
-
-# Begin level for loop
-# Create vector for future column names.
-# Paste together "Level_" with the level number.
-for(a in 1:100){
-  level_vec[a] <- paste0("Level_",a)
-} # End level for loop
-
-# Begin rate loop.
-# Returns all below data for requested rates.
-for(i in 1:length(rate)){
-
-  # Get the data about the specific rate from API.
-raw_data <- fromJSON(paste0("https://pokeapi.co/api/v2/growth-rate/",rate[i]))
-
-  # Save description of rate 
-Description <- raw_data[["descriptions"]][["description"]][3]
-
-  # Save experience required to reach ever level.
-all_exp <- raw_data[["levels"]][["experience"]]
-
-# Begin pokemon loop.
-# Gets every Pokemon in the group.
-for(b in 1:length(raw_data[["pokemon_species"]][["name"]])){
+  rate <- tolower(rate)
+  poke <- tolower(poke)
+  level <- tolower(level) 
   
-  # Save name of Pokemon.
-  Name <- raw_data[["pokemon_species"]][["name"]][b]
+  # Create empty object to be used later as the col names for the tibble.
+  level_vec <- as.character()
   
-  # Create tibble with name, description, required experience, and the future column names.
-  row_info <- tibble(Name,Description,all_exp,level_vec)
- 
-  # if first iteration of pokemon loop, the df tibble is the row_info tibble.
-  # if not first iteration of pokemon loop, the df tibble is binded with the the new row_info to add more data.
-  if(b == 1){
-    df <- row_info
+  # If all rate are requested, rate is 1 through 6, if not rate is what was inputted.
+  if("all" %in% rate){
+    rate <- c(1:6)
   }else{
-    df <- rbind(df,row_info)
-  } # End if else statement.
-} # End Pokemon loop
-
-# The tibble at the end of the Pokemon loop is in long form.
-# This changes it to wide form (one row per Pokemon) and saves as the df2 tibble.
-df2 <- pivot_wider(df, id_cols = c(Name,Description), values_from = all_exp, names_from = level_vec)
-
-# If first iteration of rate loop, the final tibble is the df2 tibble.
-# If not first iteration, final tibble is binded with the newest df2 tibble.
-if(i == 1){
-  final <- df2
-}else{
-    final <- rbind(final,df2)
-  } # End if else statement.
-} # End of rate loop.
-
-
-# If all Pokemon are requested to return, no change to the final tibble.
-# If certain Pokemon are requested, the final tibble is filtered for them.
-if("all" %in% poke){
-  final <- final
-}else{
-  final <- final %>%
-          filter(Name %in% poke)
-} # End if else statement.
-
-# If all levels are requested to return, no change to final tibble.
-# If certain levels are requested we build the names of the columns to return,
-# and select only those columns to return.
-if("all" %in% level){
-  final <- final
-}else{
-  lvl_vec <- as.character()
+    rate <- rate
+  } # End if else statement
   
-  for(c in 1:length(level)){
-    lvl_vec[c] <- paste0("Level_",level[c])
-  } 
+  # Begin level for loop
+  # Create vector for future column names.
+  # Paste together "Level_" with the level number.
+  for(a in 1:100){
+    level_vec[a] <- paste0("Level_",a)
+  } # End level for loop
   
-  final <- final %>%
-    select(Name,Description,lvl_vec)
-}# End if else statement.
-
-# Capitalize Names of Pokemon to match rest of functions.
-final$Name <- str_to_sentence(final$Name)
-
-# Return the final tibble.
-return(final)
-
+  # Begin rate loop.
+  # Returns all below data for requested rates.
+  for(i in 1:length(rate)){
+    
+    # Get the data about the specific rate from API.
+    raw_data <- fromJSON(paste0("https://pokeapi.co/api/v2/growth-rate/",rate[i]))
+    
+    # Save description of rate 
+    Description <- raw_data[["descriptions"]][["description"]][3]
+    
+    # Save experience required to reach ever level.
+    all_exp <- raw_data[["levels"]][["experience"]]
+    
+    # Begin pokemon loop.
+    # Gets every Pokemon in the group.
+    for(b in 1:length(raw_data[["pokemon_species"]][["name"]])){
+      
+      # Save name of Pokemon.
+      Name <- raw_data[["pokemon_species"]][["name"]][b]
+      
+      # Create tibble with name, description, required experience, and the future column names.
+      row_info <- tibble(Name,Description,all_exp,level_vec)
+      
+      # if first iteration of pokemon loop, the df tibble is the row_info tibble.
+      # if not first iteration of pokemon loop, the df tibble is binded with the the new row_info to add more data.
+      if(b == 1){
+        df <- row_info
+      }else{
+        df <- rbind(df,row_info)
+      } # End if else statement.
+    } # End Pokemon loop
+    
+    # The tibble at the end of the Pokemon loop is in long form.
+    # This changes it to wide form (one row per Pokemon) and saves as the df2 tibble.
+    df2 <- pivot_wider(df, id_cols = c(Name,Description), values_from = all_exp, names_from = level_vec)
+    
+    # If first iteration of rate loop, the final tibble is the df2 tibble.
+    # If not first iteration, final tibble is binded with the newest df2 tibble.
+    if(i == 1){
+      final <- df2
+    }else{
+      final <- rbind(final,df2)
+    } # End if else statement.
+  } # End of rate loop.
+  
+  
+  # If all Pokemon are requested to return, no change to the final tibble.
+  # If certain Pokemon are requested, the final tibble is filtered for them.
+  if("all" %in% poke){
+    final <- final
+  }else{
+    final <- final %>%
+      filter(Name %in% poke)
+  } # End if else statement.
+  
+  # If all levels are requested to return, no change to final tibble.
+  # If certain levels are requested we build the names of the columns to return,
+  # and select only those columns to return.
+  if("all" %in% level){
+    final <- final
+  }else{
+    lvl_vec <- as.character()
+    
+    for(c in 1:length(level)){
+      lvl_vec[c] <- paste0("Level_",level[c])
+    } 
+    
+    final <- final %>%
+      select(Name,Description,lvl_vec)
+  }# End if else statement.
+  
+  # Capitalize Names of Pokemon to match rest of functions.
+  final$Name <- str_to_sentence(final$Name)
+  
+  # Return the final tibble.
+  return(final)
+  
 } # End of function
 ```
 
@@ -731,6 +730,78 @@ kable(exp_df2)
 ```
 
 
+## Berry Function
+
+Berrries are items in the Pokemon world that can be given to a Pokemon to either eat or hold on to. Different berries have different properties that they effect. One of these properties is, when a Pokemon is taught the move "Natural Gift" if they are holding a berry the "type" of attack (think water, fire, electric etc.) can change. For more information about this I recommend [this](https://bulbapedia.bulbagarden.net/wiki/Natural_Gift_(move)) page on Bulbapedia. 
+
+So if you were interested in what berry does what type of attack with the "Natural Gift" move you could use the `berries` function! This function is designed to return the name, id number, size, smoothness, natural gift type, and natural gift power. This function takes one argument `berry`, this is defaulted to "all" since that is the most likely request, but you can give a vector of ID numbers or names if you only wanted specific information.
+
+```{r berry func}
+# Define Function
+berries <- function(berry){
+  
+  # Change to lower to allow for flexibility.
+  berry <- tolower(berry)
+  
+  # If all in berry, then berry is changed to 1-64.
+  # If all isn't requested, berry remains unchanged.
+  if("all" %in% berry){
+    berry <- c(1:64)
+  }else{
+    berry <- berry
+  } # End if else statement
+  
+  # Start Berry Loop
+  for(i in 1:length(berry)){
+    
+    # Get the data for specific berry.
+    raw_data <- fromJSON(paste0("https://pokeapi.co/api/v2/berry/",berry[i]))
+    
+    # Save name of berry.
+    name <- raw_data[["name"]]
+    
+    # Save ID number of berry.
+    id <- raw_data[["id"]]
+    
+    # Save size of berry
+    size <- raw_data[["size"]]
+    
+    # Save Smootheness of berry
+    smoothness <- raw_data[["smoothness"]]
+    
+    # Save power of natural gift.
+    nat_gift_power <- raw_data[["natural_gift_power"]]
+    
+    # Save type of natural gift.
+    nat_gift_type <- raw_data[["natural_gift_type"]][["name"]]
+    
+    # Save as a row.
+    row_info <- tibble_row(name,id,size,smoothness,nat_gift_type,nat_gift_power)
+    
+    # If first iteration of loop, the df tibble is row_info.
+    # If not first iteration of loop, bind df and row_info together.
+    if(i == 1){
+      df <- row_info
+    }else{
+      df <- rbind(df,row_info)
+    } # End if else statement
+    
+  } # End Berry loop
+  
+  # Capitalize name of berry and the type.
+  df$name <- str_to_sentence(df$name)
+  df$nat_gift_type <- str_to_sentence(df$nat_gift_type)
+  
+  # Return df tibble
+  return(df)
+} #End Function
+
+```
+
+
+
+
+
 ## Wrapper Function
 
 The final function to show is just a wrapper function called `poke_api`. The purpose of this function is to house all the other functions that we have shown here. Essentially you can just use `poke_api` to get any of the data you would like.
@@ -751,8 +822,9 @@ poke_api <- function(func,...){
          "size"      = size(...),
          "dex"       = dex(...),
          "egg_group" = egg_group(...),
-         "exp_func"  = exp_func(...)
-         )
+         "exp_func"  = exp_func(...),
+         "berries"   = berries(...)
+  )
 } #End function
 ```
 
@@ -845,9 +917,22 @@ print(exp_example)
 ```
 
 
+## Berries Function Example
+
+Below we show how to use the `berries` function. We simply return the information on all berries and print the head of the list.
+```{r berries example}
+# Use function to get data
+berry_example <- berries("all")
+
+# Print the head of the tibble.
+kable(head(berry_example))
+
+```
+
+
 ## Poke API Function Example
 
-Here we test the final function! `poke_api` if you remember this is a wrapper function that has all other functions included inside of it. We are testing the `encounter` function with our `mons` vector and for only the games red and fire red. This is the exact same result as the `encounter` example from earlier.
+Here we test the final function! `poke_api` if you remember this is a wrapper function that has all the other functions included inside of it. We are testing the `encounter` function with our `mons` vector and for only the games red and fire red. This is the exact same result as the `encounter` example from earlier.
 ```{r poke api example}
 # Use function
 poke_api(func = "encounter", poke = mons, game = c("red","firered"))
@@ -928,7 +1013,7 @@ From the table it appears the Fire Red and Leaf Green games would be a great pla
 
 Next I want to look into the base stats from each Pokemon in the Kanto region. First we have to get a list of all Pokemon in the Kanto region if only there was someway to do that, OH WAIT, the `dex` function will do that for us. After we get this list we can  use it in the `stats` function to retrieve all of their base stats.
 
-After getting all of their base stats we can create five number summaries for each stat.
+After getting all of their base stats we can create six number summaries for each stat.
 
 ```{r num sum one}
 # First get a list of all Pokemon in the Kanto region.
@@ -937,8 +1022,292 @@ kanto_mons <- poke_api("dex", reg = "kanto")
 # Get the stats for the Kanto region Pokemon
 kanto_stats <- poke_api("stats", poke = kanto_mons$Name)
 
-# Create five number summary for each of the base stats.
+# Create six number summary for each of the base stats.
 
-# summary()
+# Create vector of the names of the base stats.
+col_names <- names(kanto_stats)[2:7]
+
+# for loop to get the information for each needed column.
+for (i in 1:length(col_names)){
+  
+  # Save the kanto_stats tibble without the Name column
+  kanto_stats_2 <- kanto_stats[2:7]
+  
+  # rename the wanted column in the second tibble.
+  names(kanto_stats_2)[i] <- "need"
+  
+  # Use the summary function on the wanted column.
+  summry <- summary(kanto_stats_2$need)
+  
+  # Remove the names from the six number summary.
+  summry <- unname(summry,force = TRUE)
+  
+  # create a tibble with the six summary data. 
+  sm <- tibble(summry)
+  
+  # rename the new summary information with the correct column name
+  names(sm) <- c(paste0(col_names[i],"_summary"))
+  
+  # If first iteration of loop, summ_table is the sm tibble.
+  # If not first iteration, combine the summ_table and sm.
+  if(i == 1){
+    summ_table <- sm
+  }else{
+    summ_table <- tibble(summ_table,sm)
+  } # End if else statement. 
+} # End for loop.
+
+# Names of the summary rows.
+values <- c("Min","1Q","Med","Mean","3Q","Max")
+
+# Add names of the rows to the tibble for better looking print.
+summ_table <- tibble(values,summ_table)
+
+# Kable function for good printing.
+kable(summ_table)
 ```
+
+
+Personally I was the most surprised about the big difference between the maximum of attack vs the maximum of defense. I thought these would be closer instead of the `r (summ_table$defense_summary[6] - summ_table$attack_summary[6])` point difference that we see.
+
+
+While preforming this analysis, I became interested in the mean base stat for each Pokemon and the summary of those, so lets find that out. Here I calculate the average stats value for each Pokemon, I print the top six values in descending order of their average base stat. Then I create a six number summary of the average base stat.
+
+```{r num sum two}
+
+# Use apply to calculate the average for each row.
+kanto_stats$avg_base <- apply(kanto_stats[2:7],MARGIN = 1,FUN = mean)
+
+# Print the top six values in descending order of high average base stat.
+kable(head(kanto_stats %>%
+             arrange(-avg_base)))
+
+# Create six number summary.
+avg_sum <- summary(kanto_stats$avg_base)
+
+# Print the summary
+kable(as.array(avg_sum))
+```
+
+My biggest take away from this analysis here is that I need to try and get a Dragonite in my next play thorough of a game in the Kanto region. Dragonite is the only one in the top six who is not a legendary Pokemon so Dragonites inclusion, not only on the list in general but at the second spot on the list, is impressive.
+
+## BMI Scatter Plots 
+
+Now lets make some plots to investigate the data further.
+
+I have always been curious if a Pokemons size has any impact on their base stats. So lets find out! 
+
+First we get the national dex number for each Pokemon. Then we get the size and stats for all of them. In order to quantify the "size" I use the human [BMI formula](https://www.cdc.gov/nccdphp/dnpao/growthcharts/training/bmiage/page5_1.html#:~:text=With%20the%20metric%20system%2C%20the,by%2010%2C000%2C%20can%20be%20used.) on the Pokemon to calculate their BMI. I then create a scatter plot for each base stat with a smooth line added.
+
+Of note we removed the Pokemon Cosmoem from the data as they are a huge outlier with a BMI of 99990, the next closest was 444.
+
+```{r BMI plots}
+
+# Get all Pokemons national dex number
+natl_dex <- poke_api("dex", reg = 1, poke = "all")
+
+# Use their national dex number to get the size and stats for each Pokemon.
+all_stats <- poke_api("stats", poke = natl_dex$National_Dex_Number)
+all_size  <- poke_api("size", poke = natl_dex$National_Dex_Number)
+
+# Print head of size
+kable(head(all_size))
+
+# We calcualte the BMI for each and add to the table.
+all_size <- all_size %>%
+  mutate(BMI = (Weight_Kilograms / (Height_Meters^2)))
+
+# Print top of BMI.
+kable(head(all_size %>%
+             arrange(-BMI)))
+
+# Join stats and size
+all_size_stats <- left_join(all_stats,all_size, by = c("Name" = "Name"))
+
+# Remove a major outlier.
+all_size_stats <- all_size_stats %>%
+  filter(Name != "Cosmoem")
+
+# Create plot with HP.
+all_size_stats %>%
+  ggplot(aes(x = BMI, y = hp))+
+  geom_point()+
+  geom_smooth(method = "lm")+
+  labs(x = "BMI", y = "HP Stat", title = "Does a Pokemons BMI Effect Their HP?")
+
+# Create plot with Attack.
+all_size_stats %>%
+  ggplot(aes(x = BMI, y = attack))+
+  geom_point()+
+  geom_smooth(method = "lm")+
+  labs(x = "BMI", y = "Attack Stat", title = "Does a Pokemons BMI Effect Their Attack?")
+
+# Create plot with Defense.
+all_size_stats %>%
+  ggplot(aes(x = BMI, y = defense))+
+  geom_point()+
+  geom_smooth(method = "lm")+
+  labs(x = "BMI", y = "Defense Stat", title = "Does a Pokemons BMI Effect Their Defense?")
+
+# Create plot with Special - Attack.
+all_size_stats %>%
+  ggplot(aes(x = BMI, y = `special-attack`))+
+  geom_point()+
+  geom_smooth(method = "lm")+
+  labs(x = "BMI", y = "Special-Attack Stat", title = "Does a Pokemons BMI Effect Their Special-Attack?")
+
+# Create plot with Special-Defense.
+all_size_stats %>%
+  ggplot(aes(x = BMI, y = `special-defense`))+
+  geom_point()+
+  geom_smooth(method = "lm")+
+  labs(x = "BMI", y = "Special-Defense Stat", title = "Does a Pokemons BMI Effect Their Special-Defense?")
+
+# Create plot with Speed.
+all_size_stats %>%
+  ggplot(aes(x = BMI, y = speed))+
+  geom_point()+
+  geom_smooth(method = "lm")+
+  labs(x = "BMI", y = "Speed Stat", title = "Does a Pokemons BMI Effect Their Speed?")
+
+```
+
+Looking at these scatter plots it does appear that there is some relationship between BMI and Speed, Special Attack,and Defense. While HP, Attack, and Special Defense do not appear to have much of an effect from BMI. Maybe this would change if we removed a few more of the outliers.
+
+
+
+## Berry Bar Graph
+
+I was curious how many berries are related to each natural gift type. So lets make a bar plot to check it out. Earlier we created `berry_example` which is a list of all berries and their attributes, so no need to call the function again here we will just use the one already created. For fun, in the graphs we also use the official Pokemon yellow and blue!
+
+```{r berry bar graph}
+# Create bar plot
+berry_example %>%
+  ggplot(aes(y = nat_gift_type))+
+  geom_bar(position = "dodge", fill = "#FFDE00", color = "#3B4CCA")+ # Use official Pokemon colors for graph.
+  labs(
+    x = "Count of Berries",
+    y = "Natural Gift Type",
+    title = "How Many Berries Give Each Type?"
+  )
+```
+
+I was surprised to see that this was so consistent. I thought that there would be more spread between how many berries cause each natural gift type, instead almost all of them have four berries that cause the specific type. The exceptions are Steel which has three berries that could be used, and Normal which only has the two berries. 
+
+## Base Stats Histograms
+
+Earlier we looked at six number summary for the base stats of Pokemon in the Kanto region. Here we are going to continue some analysis along the same path. Except now we will create histograms for it!
+
+From earlier we already have an object called `kanto_stats` that has all the base stats for the Pokemon in the Kanto region, as well as the `avg_base` variable that we created earlier. Since this is already created we will use it here.
+
+```{r base stats histograms}
+
+# Create Histogram for HP
+kanto_stats %>%
+  ggplot(aes(x = hp))+
+  geom_histogram(fill = "#FFDE00", color = "#3B4CCA", binwidth = 10)+
+  labs(
+    x = "HP Base Stat",
+    y = "Count of Bin",
+    title = "Histogram of the HP Base Stat")
+
+# Create Histogram for Attack
+kanto_stats %>%
+  ggplot(aes(x = attack))+
+  geom_histogram(fill = "#FFDE00", color = "#3B4CCA", binwidth = 10)+
+  labs(
+    x = "Attack Base Stat",
+    y = "Count of Bin",
+    title = "Histogram of the Attack Base Stat")
+
+# Create Histogram for Defense
+kanto_stats %>%
+  ggplot(aes(x = defense))+
+  geom_histogram(fill = "#FFDE00", color = "#3B4CCA", binwidth = 10)+
+  labs(
+    x = "Defense Base Stat",
+    y = "Count of Bin",
+    title = "Histogram of the Defense Base Stat")
+
+# Create Histogram for Special Attack
+kanto_stats %>%
+  ggplot(aes(x = `special-attack`))+
+  geom_histogram(fill = "#FFDE00", color = "#3B4CCA", binwidth = 10)+
+  labs(
+    x = "Special-Attack Base Stat",
+    y = "Count of Bin",
+    title = "Histogram of the Special-Attack Base Stat")
+
+# Create Histogram for Special Defense
+kanto_stats %>%
+  ggplot(aes(x = `special-defense`))+
+  geom_histogram(fill = "#FFDE00", color = "#3B4CCA", binwidth = 10)+
+  labs(
+    x = "Special-Defense Base Stat",
+    y = "Count of Bin",
+    title = "Histogram of the Special-Defense Base Stat")
+
+# Create Histogram for Speed
+kanto_stats %>%
+  ggplot(aes(x = speed))+
+  geom_histogram(fill = "#FFDE00", color = "#3B4CCA", binwidth = 10)+
+  labs(
+    x = "Speed Base Stat",
+    y = "Count of Bin",
+    title = "Histogram of the Speed Base Stat")
+
+# Create Histogram for The average of base stats.
+kanto_stats %>%
+  ggplot(aes(x = avg_base))+
+  geom_histogram(fill = "#FFDE00", color = "#3B4CCA", binwidth = 10)+
+  labs(
+    x = "Average of Base Stats",
+    y = "Count of Bin",
+    title = "Histogram of the Avegrage of Base Stats")
+
+
+```
+
+
+All of these provide some interesting insight but the thing that sticks out the most to me might be just how much of an outlier the 250 HP base stat is. Upon further investigation this Pokemon is Chansey, which I suppose makes some sense as HP is health, and in the Pokemon TV series, Chansey always worked in the PokeCenter (A hospital for Pokemon). You can read more about Chansey [here](https://bulbapedia.bulbagarden.net/wiki/Chansey_(Pok%C3%A9mon)). 
+
+
+## BMI Box Plot
+
+For our last analysis I was curious what the spread of BMIs looked like in every egg group. So lets create some box plots!
+
+First we use the `poke_api` function to use the `egg_group` function. Then we take out the second egg group column as not every Pokemon has two. Fianlly we make the boxplot.
+
+```{r bmi box plot}
+
+# Get needed data
+egg_group_data <- poke_api("egg_group",poke="all",group = "all")
+
+# Remove Egg group 2
+egg_group_data <- egg_group_data %>%
+  select(Name,Egg_Group_1)
+
+# Join with BMI data
+egg_group_bmi <- left_join(egg_group_data,all_size_stats, by = c("Name" = "Name"))
+
+# Keep only name, egg group, and BMI.
+egg_group_bmi <- egg_group_bmi %>%
+  select(Name,Egg_Group_1,BMI)
+
+# Create boxplot
+egg_group_bmi %>%
+  ggplot(aes(x = Egg_Group_1, y = BMI))+
+  geom_boxplot(fill = "#FFDE00", color = "#3B4CCA")+
+  labs(
+    x = "Egg Group",
+    y = "BMI",
+    title = "BMI Boxplot By Egg Group")+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+
+Looking at the Boxplots, the Egg Group with the most variability looks to me like the Mineral group. Whereas the smallest is Ditto, as that is only one Pokemon. Ignoring the Ditto group, Humanshape seems to be the group with the least variability in BMI. I suppose this makes some sense because if the Pokemon are all roughly human shaped and sized they would all have similar BMIs.
+
+
 

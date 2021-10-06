@@ -143,5 +143,169 @@ col_names <- col_names[2:7]
 
 
 hp_sum <- summary(kanto_stats$hp)
+hp_sum <- unname(hp_sum)  
+hp_sum
+
+attack_sum <- summary(kanto_stats$attack)
+attack_sum <- unname(attack_sum)
+attack_sum
+
+test <- tibble(hp_sum,attack_sum)
+
+tib <- tibble(hp_sum)
+
+val <- col_names[1]
+
+blue <- summary(kanto_stats$paste0(col_names[1]))
+
+blue <- unname(blue)
+
+for (i in 1:length(col_names)){
   
-         
+     test <- kanto_stats[2:7]
+     
+     names(test)[i] <- "need"
+  
+    summry <- summary(test$need)
+    
+    summry <- unname(summry,force = TRUE)
+  
+    sm <- tibble(summry)
+  
+  names(sm) <- c(paste0(col_names[i],"_summary"))
+  
+  if(i == 1){
+    summ_table <- sm
+  }else{
+      summ_table <- tibble(summ_table,sm)
+    }
+}
+
+row.names(summ_table) <- c("Min","1Q","Med","Mean","3Q","Max")
+
+unname(summ_table)
+str(summ_table)
+
+
+
+
+
+summ_table$defense_summary[6]
+
+kanto_stats$avg <- apply(kanto_stats[2:7],MARGIN = 1,FUN = mean)
+
+
+
+
+kanto_stats <- kanto_stats %>%
+  mutate(avg_base = mean(kanto_stats$hp,kanto_stats$attack,kanto_stats$defense,kanto_stats$`special-attack`,kanto_stats$`special-defense`,kanto_stats$speed))
+
+
+size_2 <- function(poke) {
+  
+  # change poke to lower case for flexibility.
+  poke <- tolower(poke)
+  
+  # Looping for entrance of a vector
+  for(i in 1:length(poke)){
+    
+    # Get requested data from API
+    raw_data <- fromJSON(paste0("https://pokeapi.co/api/v2/pokemon/",poke[i]), flatten = TRUE)
+    
+    # Select only the information about the base stats
+    df <- as_tibble(raw_data[["stats"]])
+    
+    # Add a column for the name of the Pokemon 
+    df$Name <- str_to_sentence(raw_data[["name"]])
+    
+    # Keep only needed columns and reorder
+    df <- df[,c(5,1,3)]
+    
+    # Pivot from long form to a single row
+    df <- df %>%
+      pivot_wider(names_from = stat.name, values_from = base_stat)
+    
+    
+    # If first iteration of loop, the final tibble  is created
+    # If not the first iteration bind the final tibble from the previous loops 
+    # with the new information
+    if( i == 1){
+      final <- df
+    }else{
+      final <- rbind(final,df)
+    } # End if else statement
+  
+    message(paste0("Completed ",i," out of ",length(poke)," Rows."))
+    }# End loop
+  
+  # Return the final tibble.
+  return(final)
+}
+
+test_df <- size_2(poke = natl_dex$Name)
+
+
+raw_data <- fromJSON("https://pokeapi.co/api/v2/berry/1")
+
+
+
+berries <- function(berry){
+  
+  berry <- tolower(berry)
+
+  if("all" %in% berry){
+    berry <- c(1:64)
+  }else{
+    berry <- berry
+  }
+
+  for(i in 1:length(berry)){
+  
+  raw_data <- fromJSON(paste0("https://pokeapi.co/api/v2/berry/",berry[i]))
+
+  name <- raw_data[["name"]]
+  
+  id <- raw_data[["id"]]
+  
+  size <- raw_data[["size"]]
+  
+  smoothness <- raw_data[["smoothness"]]
+  
+  nat_gift_power <- raw_data[["natural_gift_power"]]
+  
+  nat_gift_type <- raw_data[["natural_gift_type"]][["name"]]
+
+  row_info <- tibble_row(name,id,size,smoothness,nat_gift_type,nat_gift_power)
+  
+  if(i == 1){
+    df <- row_info
+  }else{
+    df <- rbind(df,row_info)
+  } # End if else statement
+  
+} # End Berry loop
+
+  
+  return(df)
+} #End Function
+
+
+berries("cheri")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
